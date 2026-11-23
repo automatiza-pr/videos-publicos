@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Manifiesto de Servicio – True Waste</title>
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
   :root { --navy:#1b2a4a; --blue:#1aa3e8; --gray:#5b6577; --line:#d7dde8; --bg:#f3f6fa; --green:#16a34a; --red:#dc2626; }
   * { box-sizing:border-box; }
@@ -343,6 +343,100 @@ function buildDoc(numero){
   if (fotos) html += '<div class="pg" style="page-break-before:always"><h3>FOTOS DEL SERVICIO – Factura/Conduce '+numero+'</h3><div class="ph">'+fotos+'</div></div>';
   document.getElementById('doc').innerHTML = html;
 }
+function buildPdf(numero){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'letter', compress:true });
+  const W = 612, M = 26, R = W - M;
+  const m = noteOf('svcMensual', MENSUAL), o = noteOf('svcOtros', OTROS);
+  const F = (st, sz) => { doc.setFont('helvetica', st); doc.setFontSize(sz); };
+  const txt = (s, x, y, opt) => doc.text(String(s==null?'':s), x, y, opt||{});
+  const line = (x1,y1,x2,y2,w) => { doc.setLineWidth(w||0.6); doc.line(x1,y1,x2,y2); };
+  const tick = (x, y, s) => { s = s||7; doc.setLineWidth(1.4); doc.line(x, y, x+s*0.38, y+s*0.4); doc.line(x+s*0.38, y+s*0.4, x+s, y-s*0.55); doc.setLineWidth(0.6); };
+  const field = (label, value, x, y, w) => { F('normal',9.5); txt(label, x, y); const lw = doc.getTextWidth(label)+5; line(x+lw, y+2.5, x+w, y+2.5, 0.5); F('normal',9.5); const v2 = doc.splitTextToSize(String(value||''), w-lw-4)[0]||''; txt(v2, x+lw+3, y); };
+  const box = (y, h) => { doc.setLineWidth(1.4); doc.rect(M, y, R-M, h); doc.setLineWidth(0.6); };
+  const title = (s, x, y, sz) => { F('bold', sz||10.5); txt(s, x, y); };
+  // ---------- Encabezado ----------
+  try { doc.addImage(__LOGO, 'JPEG', M+6, M-4, 66, 66); } catch(e){}
+  F('bold',9); txt('Servicios:', M, M+74); F('normal',8.5); txt('Recogido de Aceite Vegetal', M, M+84); txt('Limpieza trampa de Grasa', M, M+94);
+  const cx = 292;
+  F('normal',9); txt('3623 Ave. Militar PMB 112 Isabela, PR 00662', cx, M+10, {align:'center'});
+  F('bold',10); txt('Tels. 787-291-7287 · 787-380-1062 ISABELA', cx, M+24, {align:'center'}); txt('787-380-4888 BAYAMÓN', cx, M+37, {align:'center'});
+  line(cx-115, M+43, cx+115, M+43, 0.8);
+  F('normal',9); txt('truewasteoilrecycling@gmail.com', cx, M+55, {align:'center'}); txt('www.truewasteoilrecycling.com', cx, M+67, {align:'center'}); txt('www.truewasteoil.com', cx, M+79, {align:'center'});
+  const bx = R-150, by = M+28;
+  doc.setFillColor(58,58,58); doc.rect(bx, by, 150, 20, 'F'); doc.setLineWidth(1.4); doc.rect(bx, by, 150, 50); doc.setLineWidth(0.6);
+  doc.setTextColor(255,255,255); F('bold',11.5); txt('Factura/Conduce', bx+75, by+14, {align:'center'});
+  doc.setTextColor(200,0,0); F('bold',17); txt(String(numero), bx+75, by+42, {align:'center'}); doc.setTextColor(0,0,0);
+  let y = M + 104;
+  // ---------- Reportes de servicio ----------
+  box(y, 90); title('REPORTES DE SERVICIO', M+8, y+14);
+  const L = M+8, FW = R-M-16, half = FW/2 - 6;
+  field('Nombre:', v('nombre'), L, y+30, FW);
+  field('Dirección:', v('direccion'), L, y+44, FW);
+  field('Teléfono:', v('telefono'), L, y+58, half); field('Tel. Emergencias:', v('tel_emergencia'), L+half+12, y+58, half);
+  field('PO#', v('po'), L, y+72, half); field('Contacto:', v('contacto'), L+half+12, y+72, half);
+  field('Trampa:', v('trampa'), L, y+86 - 1, FW);
+  y += 96;
+  // ---------- Inspección ----------
+  box(y, 118); title('INSPECCION REALIZADA', M+8, y+14);
+  const tx = M+80, tw = R-8-tx, cw = tw/COLS.length, rh = 15, ty = y+21;
+  F('bold',8); doc.setLineWidth(0.6);
+  COLS.forEach((c,j) => { doc.rect(tx+j*cw, ty, cw, rh); txt(c, tx+j*cw+cw/2, ty+10.5, {align:'center'}); });
+  ROWS.forEach((r,i) => { const yy = ty+rh*(i+1); F('bold',8.5); txt(r, tx-5, yy+10.5, {align:'right'});
+    COLS.forEach((c,j) => { doc.rect(tx+j*cw, yy, cw, rh); if (S.insp[i+'_'+j]) tick(tx+j*cw+cw/2-4, yy+9, 8); }); });
+  y += 124;
+  // ---------- Servicios ----------
+  box(y, 72);
+  const c3 = (R-M-16)/3, x1 = M+8, x2 = x1+c3+4, x3 = x2+c3+4, iw = c3-10;
+  const item = (n, on, note, x, yy) => { F('normal',9); txt(n, x, yy); const lw = doc.getTextWidth(n)+5; line(x+lw, yy+2.5, x+iw, yy+2.5, 0.5);
+    if (on) { tick(x+lw+6, yy-1.5, 7); if (note) { F('bold',8); txt(doc.splitTextToSize(note, iw-lw-20)[0]||'', x+lw+18, yy); } } };
+  title('SERVICIO MENSUAL REALIZADO', x1, y+13, 9.5); title('OTROS SERVICIOS', x2, y+13, 9.5);
+  MENSUAL.forEach((n,i) => item(n, S.mensual[n], m[n], x1, y+27+i*12));
+  OTROS.slice(0,3).forEach((n,i) => item(n, S.otros[n], o[n], x2, y+27+i*12));
+  OTROS.slice(3).forEach((n,i) => item(n, S.otros[n], o[n], x3, y+27+i*12));
+  y += 78;
+  // ---------- Recomendaciones ----------
+  box(y, 58); title('RECOMENDACIONES', M+8, y+13, 10);
+  RECS.forEach((n,i) => item(n, S.recs[n], '', [x1,x2,x3][Math.floor(i/3)], y+27+(i%3)*12));
+  y += 64;
+  // ---------- Comentarios y cierre ----------
+  const bh = 196; box(y, bh); title('Comentarios / Observaciones', M+8, y+14, 10.5);
+  F('normal',9.5); const cl = doc.splitTextToSize(v('comentarios'), FW).slice(0,4); cl.forEach((l,i) => txt(l, L, y+28+i*11.5));
+  line(L, y+74, R-8, y+74, 0.6);
+  const fy = y+92, lw2 = 300;
+  const [yy_,mm_,dd_] = (v('fecha')||'').split('-'); const fechaTxt = dd_ ? dd_+'/'+mm_+'/'+yy_ : '';
+  field('Fecha de Servicio:', fechaTxt, L, fy, 150); field('Representante:', v('representante'), L+160, fy, lw2-160+40);
+  field('Realizado por:', v('tecnico'), L, fy+16, lw2+40);
+  field('Hora:', v('hora'), L, fy+32, 150);
+  field('Recibimos conforme este servicio:', v('recibe'), L, fy+52, lw2+40);
+  F('normal',9.5); txt('Firma:', L, fy+80); line(L+32, fy+82, L+lw2+40, fy+82, 0.5);
+  if (sigDrawn) { try { const fc=document.getElementById('firma'); const t=document.createElement('canvas'); t.width=560; t.height=Math.round(560*fc.height/fc.width); const tx_=t.getContext('2d'); tx_.fillStyle='#fff'; tx_.fillRect(0,0,t.width,t.height); tx_.drawImage(fc,0,0,t.width,t.height); const ar=t.height/t.width; const sw=Math.min(170, 34/ar); doc.addImage(t.toDataURL('image/jpeg',0.85), 'JPEG', L+40, fy+54, sw, sw*ar); } catch(e){} }
+  // totales
+  const tx2 = R-8, lab = tx2-90;
+  const tot = (lbl, val, yy, b) => { F(b?'bold':'normal', b?10.5:9.5); txt(lbl, lab-4, yy, {align:'right'}); line(lab, yy+2.5, tx2, yy+2.5, 0.5); txt(money(val), tx2-3, yy, {align:'right'}); };
+  tot('Sub-Total: $', v('subtotal'), fy-8, 0); tot('Tax o IVU: $', v('ivu'), fy+8, 0); tot('Serv. Emergencia: $', v('emerg'), fy+24, 0); tot('TOTAL: $', v('total'), fy+40, 1);
+  PAYS.forEach((p,i) => { const yy = fy+56+i*13, xx = lab-40; doc.rect(xx, yy-8, 9, 9); if (S.pago===p) tick(xx+1, yy-3, 7);
+    F('normal',9.5); txt(p + ((S.pago===p && (p==='CK #'||p==='Otro')) ? ' ' + v('payDet') : ''), xx+14, yy); });
+  y += bh + 8;
+  // ---------- Notas ----------
+  doc.setLineWidth(0.8); doc.rect(M, y, 150, 44); F('bold',7); txt('NOTA:', M+4, y+9); F('normal',6.6);
+  doc.splitTextToSize('Los servicios mensuales no intentan reemplazar las buenas costumbres. El personal de la cocina no debe desechar objetos extraños por fregaderos y drenajes.', 142).forEach((l,i) => txt(l, M+4, y+18+i*7.5));
+  F('bold',12.5); txt('Todo cheque devuelto tiene un cargo de $25.00', (M+160+R)/2, y+14, {align:'center'});
+  doc.setLineWidth(1.4); doc.rect(M+160, y+22, R-M-160, 22); F('bold',11); txt('Esta factura debe ser pagada en su totalidad al momento del servicio', (M+160+R)/2, y+37, {align:'center'});
+  F('normal',6.5); doc.setTextColor(110,110,110); txt('Reporte digital · ' + T.codigo + ' · generado ' + new Date().toLocaleString('es-PR'), R, 786, {align:'right'}); doc.setTextColor(0,0,0);
+  // ---------- Fotos ----------
+  const fotos = S.fotos.map((f,i)=>f?{f,i}:null).filter(Boolean);
+  if (fotos.length) {
+    doc.addPage(); F('bold',12); txt('FOTOS DEL SERVICIO – Factura/Conduce ' + numero, M, M+12); F('normal',9); txt(T.cliente + ' · ' + T.codigo, M, M+26);
+    const pw = (R-M-14)/2, ph = 300;
+    fotos.forEach((p,k) => { const xx = M + (k%2)*(pw+14), yy = M+40 + Math.floor(k/2)*(ph+30);
+      try { const ip = doc.getImageProperties(p.f); const sc = Math.min(pw/ip.width, ph/ip.height); const iw2 = ip.width*sc, ih2 = ip.height*sc;
+        doc.addImage(p.f, 'JPEG', xx+(pw-iw2)/2, yy+(ph-ih2)/2, iw2, ih2); } catch(e){}
+      doc.setLineWidth(0.5); doc.rect(xx, yy, pw, ph); F('normal',9); txt('Foto ' + (p.i+1) + ' – ' + (p.i<2?'Antes':'Después'), xx+pw/2, yy+ph+12, {align:'center'}); });
+  }
+  return doc.output('datauristring').split(',')[1];
+}
+
 function ov(on, msg){ document.getElementById('overlay').classList.toggle('hidden',!on); if(msg) document.getElementById('ovMsg').textContent = msg; }
 async function guardar(){
   const err = document.getElementById('formErr'); err.textContent='';
@@ -355,11 +449,9 @@ async function guardar(){
     const j1 = await r1.json(); if (!j1.ok) throw new Error(j1.error||'No se pudo reservar el número');
     const numero = j1.numero;
     ov(true, 'Creando el PDF…');
-    buildDoc(numero);
-    const pdf = await html2pdf().set({ margin:0, filename:'reporte.pdf', image:{type:'jpeg',quality:0.9}, html2canvas:{scale:2, useCORS:true, windowWidth:816},
-      jsPDF:{unit:'in', format:'letter', orientation:'portrait'}, pagebreak:{mode:['css']} }).from(document.getElementById('doc')).outputPdf('datauristring');
+    const pdfB64 = buildPdf(numero);
     ov(true, 'Guardando en el sistema…');
-    const body = { k:T.token, pin:PIN, numero, pdf: pdf.split(',')[1], fecha:v('fecha'), tecnico:v('tecnico'), total:v('total'), pago:S.pago + (v('payDet')?' '+v('payDet'):''),
+    const body = { k:T.token, pin:PIN, numero, pdf: pdfB64, fecha:v('fecha'), tecnico:v('tecnico'), total:v('total'), pago:S.pago + (v('payDet')?' '+v('payDet'):''),
       resumen: Object.keys(S.mensual).filter(k=>S.mensual[k]).concat(Object.keys(S.otros).filter(k=>S.otros[k])).join(', ') };
     const r2 = await fetch(BASE+'truewaste/api/save', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
     const j2 = await r2.json(); if (!j2.ok) throw new Error(j2.error||'No se pudo guardar');
