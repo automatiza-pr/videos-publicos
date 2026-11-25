@@ -55,6 +55,15 @@
   #overlay { position:fixed; inset:0; background:rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:50; font-size:20px; color:var(--navy); }
   .spin { width:54px; height:54px; border:6px solid #dbeafe; border-top-color:var(--blue); border-radius:50%; animation:s 1s linear infinite; margin-bottom:14px; }
   @keyframes s { to { transform:rotate(360deg); } }
+  /* ====== Ubicación del establecimiento ====== */
+  .ubi { background:#eef6ff; border:1.5px solid #bfdbfe; }
+  .ubi h2 { display:flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0; font-size:18px; }
+  #mapa { width:100%; height:240px; border-radius:10px; border:1px solid var(--line); background:#e5e7eb; display:flex; align-items:center; justify-content:center; color:var(--gray); font-size:14px; text-align:center; }
+  a.ir { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:10px; padding:14px; border-radius:10px; background:#1a73e8; color:#fff; font-weight:700; font-size:18px; text-decoration:none; }
+  .gps { display:flex; align-items:center; gap:10px; margin-top:10px; padding:10px 12px; background:#fff; border:1px solid #bfdbfe; border-radius:10px; font-size:15px; color:var(--navy); }
+  .gps b { font-weight:700; } .gps .sp { flex:1; }
+  .gps button { font-size:14px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; }
+  .ubi .nota-gps { font-size:13px; color:var(--gray); margin-top:8px; }
   @media (max-width:700px) { .grid2,.grid3 { grid-template-columns:1fr; } .fotos { grid-template-columns:1fr 1fr; } }
 
   /* ====== Documento imprimible (igual al papel) ====== */
@@ -129,6 +138,15 @@
       <div><label class="f">Contacto</label><input type="text" id="contacto"></div>
     </div>
     <label class="f">Trampa</label><input type="text" id="trampa" readonly style="background:#f1f5f9">
+  </div>
+
+  <div class="card ubi">
+    <h2>📍 Ubicación del establecimiento</h2>
+    <div id="mapa">Cargando mapa…</div>
+    <a class="ir" id="irMaps" target="_blank" rel="noopener">➤ Cómo llegar con Google Maps</a>
+    <div class="gps">🎯 <span>Coordenadas GPS: <b id="gpsTxt">—</b></span><span class="sp"></span><button type="button" onclick="copiarGps()">Copiar</button></div>
+    <button type="button" class="small" style="margin-top:10px" onclick="usarMiUbicacion()">📡 Usar mi ubicación actual</button>
+    <div class="nota-gps" id="gpsNota"></div>
   </div>
 
   <div class="card">
@@ -260,6 +278,60 @@ function initForm(){
   document.getElementById('fotos').innerHTML = lbls.map((l,i)=>'<label class="foto" id="f'+i+'"><span>📷<br>Foto '+(i+1)+'<br>('+l+')</span><input type="file" accept="image/*" capture="environment" data-i="'+i+'"></label>').join('');
   document.querySelectorAll('.foto input').forEach(inp => inp.onchange = e => loadFoto(e.target));
   initSig();
+  initMapa();
+}
+// ----- Mapa de ubicación (Google Maps solo para geografía y navegación) -----
+const GKEY = 'AIzaSyB-cyjnluqqHry89MTUsnNeK78YC2-XO-g';
+let MAPA = null, MARK = null, INFO = null, POS = null, SVC_GPS = null;
+function $id(i){ return document.getElementById(i); }
+function setPos(lat, lng, fuente){
+  POS = { lat:+lat, lng:+lng };
+  $id('gpsTxt').textContent = POS.lat.toFixed(4) + ', ' + POS.lng.toFixed(4);
+  $id('irMaps').href = 'https://www.google.com/maps/dir/?api=1&destination=' + POS.lat + ',' + POS.lng;
+  $id('gpsNota').textContent = fuente || '';
+  if (MAPA) {
+    MAPA.setCenter(POS); MAPA.setZoom(17); MARK.setPosition(POS);
+    INFO.setContent('<div style="font-family:Arial;font-size:13px;max-width:220px"><b>' + esc(T.cliente) + '</b><br>' + esc(T.direccion||'') + '</div>');
+    INFO.open({ anchor:MARK, map:MAPA });
+  }
+}
+function initMapa(){
+  const dir = (T.direccion||'').trim();
+  $id('irMaps').href = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent((dir || T.cliente) + ', Puerto Rico');
+  window.gm_authFailure = () => { $id('mapa').textContent = 'El mapa no está disponible ahora. Usa el botón "Cómo llegar".'; };
+  window.__twMapa = () => {
+    const pr = { lat:18.22, lng:-66.45 };
+    MAPA = new google.maps.Map($id('mapa'), { center:pr, zoom:9, mapTypeControl:false, streetViewControl:false, fullscreenControl:true, gestureHandling:'cooperative' });
+    MARK = new google.maps.Marker({ map:MAPA, position:pr });
+    INFO = new google.maps.InfoWindow();
+    if (T.lat && T.lng) { setPos(T.lat, T.lng, 'Ubicación guardada del cliente.'); return; }
+    if (!dir) { $id('gpsNota').textContent = 'Este cliente no tiene dirección. Usa "Usar mi ubicación actual" al llegar.'; return; }
+    new google.maps.Geocoder().geocode({ address: dir + ', Puerto Rico', region:'pr' }, (res, st) => {
+      if (st === 'OK' && res && res[0]) { const l = res[0].geometry.location; setPos(l.lat(), l.lng(), 'Ubicación aproximada según la dirección. Si no es exacta, usa "Usar mi ubicación actual" al llegar.'); }
+      else $id('gpsNota').textContent = 'No se encontró la dirección en el mapa. Usa "Usar mi ubicación actual" al llegar.';
+    });
+  };
+  const s = document.createElement('script');
+  s.src = 'https://maps.googleapis.com/maps/api/js?key=' + GKEY + '&callback=__twMapa&loading=async&language=es&region=PR';
+  s.async = true; s.onerror = () => { $id('mapa').textContent = 'No se pudo cargar el mapa. Usa el botón "Cómo llegar".'; };
+  document.head.appendChild(s);
+}
+function leerGps(ms){
+  return new Promise(ok => {
+    if (!navigator.geolocation) return ok(null);
+    navigator.geolocation.getCurrentPosition(p => ok({ lat:p.coords.latitude, lng:p.coords.longitude, acc:Math.round(p.coords.accuracy) }), () => ok(null), { enableHighAccuracy:true, timeout:ms||8000, maximumAge:60000 });
+  });
+}
+async function usarMiUbicacion(){
+  $id('gpsNota').textContent = 'Buscando tu ubicación…';
+  const g = await leerGps(12000);
+  if (!g) { $id('gpsNota').textContent = 'No se pudo leer el GPS. Revisa que la tablet tenga la ubicación activada y permite el acceso.'; return; }
+  SVC_GPS = g; setPos(g.lat, g.lng, 'Ubicación tomada con el GPS de la tablet (precisión ±' + g.acc + ' m).');
+}
+function copiarGps(){
+  if (!POS) return;
+  const full = POS.lat.toFixed(6) + ', ' + POS.lng.toFixed(6);
+  (navigator.clipboard ? navigator.clipboard.writeText(full) : Promise.reject()).then(() => { $id('gpsNota').textContent = 'Coordenadas copiadas: ' + full; }).catch(() => { $id('gpsNota').textContent = full; });
 }
 function mkChecks(id, list, store, withNote){
   const c = document.getElementById(id);
@@ -423,7 +495,7 @@ function buildPdf(numero){
   doc.splitTextToSize('Los servicios mensuales no intentan reemplazar las buenas costumbres. El personal de la cocina no debe desechar objetos extraños por fregaderos y drenajes.', 142).forEach((l,i) => txt(l, M+4, y+18+i*7.5));
   F('bold',12.5); txt('Todo cheque devuelto tiene un cargo de $25.00', (M+160+R)/2, y+14, {align:'center'});
   doc.setLineWidth(1.4); doc.rect(M+160, y+22, R-M-160, 22); F('bold',11); txt('Esta factura debe ser pagada en su totalidad al momento del servicio', (M+160+R)/2, y+37, {align:'center'});
-  F('normal',6.5); doc.setTextColor(110,110,110); txt('Reporte digital · ' + T.codigo + ' · generado ' + new Date().toLocaleString('es-PR'), R, 786, {align:'right'}); doc.setTextColor(0,0,0);
+  F('normal',6.5); doc.setTextColor(110,110,110); txt('Reporte digital · ' + T.codigo + (SVC_GPS ? ' · GPS del servicio ' + SVC_GPS.lat.toFixed(5) + ', ' + SVC_GPS.lng.toFixed(5) : '') + ' · generado ' + new Date().toLocaleString('es-PR'), R, 786, {align:'right'}); doc.setTextColor(0,0,0);
   // ---------- Fotos ----------
   const fotos = S.fotos.map((f,i)=>f?{f,i}:null).filter(Boolean);
   if (fotos.length) {
@@ -448,10 +520,12 @@ async function guardar(){
     const r1 = await fetch(BASE+'truewaste/api/start', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({k:T.token, pin:PIN})});
     const j1 = await r1.json(); if (!j1.ok) throw new Error(j1.error||'No se pudo reservar el número');
     const numero = j1.numero;
+    if (!SVC_GPS) { ov(true, 'Leyendo GPS…'); SVC_GPS = await leerGps(6000); }
     ov(true, 'Creando el PDF…');
     const pdfB64 = buildPdf(numero);
     ov(true, 'Guardando en el sistema…');
     const body = { k:T.token, pin:PIN, numero, pdf: pdfB64, fecha:v('fecha'), tecnico:v('tecnico'), total:v('total'), pago:S.pago + (v('payDet')?' '+v('payDet'):''),
+      gps: SVC_GPS ? SVC_GPS.lat.toFixed(6) + ',' + SVC_GPS.lng.toFixed(6) : '',
       resumen: Object.keys(S.mensual).filter(k=>S.mensual[k]).concat(Object.keys(S.otros).filter(k=>S.otros[k])).join(', ') };
     const r2 = await fetch(BASE+'truewaste/api/save', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
     const j2 = await r2.json(); if (!j2.ok) throw new Error(j2.error||'No se pudo guardar');
