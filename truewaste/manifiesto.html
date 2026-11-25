@@ -326,7 +326,16 @@ async function usarMiUbicacion(){
   $id('gpsNota').textContent = 'Buscando tu ubicación…';
   const g = await leerGps(12000);
   if (!g) { $id('gpsNota').textContent = 'No se pudo leer el GPS. Revisa que la tablet tenga la ubicación activada y permite el acceso.'; return; }
-  SVC_GPS = g; setPos(g.lat, g.lng, 'Ubicación tomada con el GPS de la tablet (precisión ±' + g.acc + ' m).');
+  SVC_GPS = g; setPos(g.lat, g.lng, 'Ubicación tomada con el GPS de la tablet (precisión ±' + g.acc + ' m). Guardando…');
+  const ok = await guardarUbicacion(g);
+  $id('gpsNota').textContent = ok ? '✔ Ubicación guardada para las próximas visitas (precisión ±' + g.acc + ' m).' : 'Se usó en este reporte, pero no se pudo guardar para próximas visitas. Intenta otra vez.';
+}
+async function guardarUbicacion(g){
+  try {
+    const r = await fetch(BASE + 'truewaste/api/ubicacion', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ k:T.token, pin:PIN, lat:g.lat, lng:g.lng }) });
+    const j = await r.json(); if (j.ok) { T.lat = g.lat; T.lng = g.lng; return true; }
+  } catch(e){}
+  return false;
 }
 function copiarGps(){
   if (!POS) return;
@@ -521,6 +530,7 @@ async function guardar(){
     const j1 = await r1.json(); if (!j1.ok) throw new Error(j1.error||'No se pudo reservar el número');
     const numero = j1.numero;
     if (!SVC_GPS) { ov(true, 'Leyendo GPS…'); SVC_GPS = await leerGps(6000); }
+    if (SVC_GPS && !(T.lat && T.lng) && SVC_GPS.acc <= 100) await guardarUbicacion(SVC_GPS);
     ov(true, 'Creando el PDF…');
     const pdfB64 = buildPdf(numero);
     ov(true, 'Guardando en el sistema…');
