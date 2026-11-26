@@ -1,491 +1,238 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Historial QR – Demo Fumigación · Automatiza PR</title>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Historial QR · Demo · Automatiza PR</title>
+<meta property="og:title" content="Historial QR · Demo">
+<meta property="og:description" content="Cada equipo o local con su QR: historial de servicios y reportes en PDF.">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root { --brand:#0f766e; --brand2:#115e59; --acc:#f59e0b; --ink:#0f172a; --gray:#64748b; --line:#e2e8f0; --bg:#f1f5f9; --ok:#16a34a; --warn:#d97706; --bad:#dc2626; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); }
-  a { color:inherit; }
-  .demo-bar { background:#111827; color:#fde68a; font-size:13px; text-align:center; padding:7px 10px; }
-  .demo-bar b { color:#fff; }
-  header.top { background:linear-gradient(135deg,var(--brand),var(--brand2)); color:#fff; padding:14px 18px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:20; box-shadow:0 2px 10px rgba(0,0,0,.15); }
-  header.top .logo { width:44px; height:44px; border-radius:12px; background:#fff; display:flex; align-items:center; justify-content:center; flex:none; }
-  header.top h1 { margin:0; font-size:18px; line-height:1.15; }
-  header.top .sub { font-size:13px; opacity:.85; }
-  header.top .sp { flex:1; }
-  header.top button { background:rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.35); border-radius:10px; padding:8px 12px; font-size:14px; cursor:pointer; }
-  main { max-width:980px; margin:0 auto; padding:16px; }
-  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:14px; box-shadow:0 1px 2px rgba(0,0,0,.03); }
-  .card h2 { margin:0 0 12px; font-size:16px; color:var(--brand2); text-transform:uppercase; letter-spacing:.6px; }
-  .muted { color:var(--gray); font-size:14px; }
-  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:0; border-radius:12px; padding:14px 18px; font-size:17px; font-weight:700; cursor:pointer; text-decoration:none; }
-  .btn.pri { background:var(--brand); color:#fff; } .btn.acc { background:var(--acc); color:#111; } .btn.ghost { background:#fff; color:var(--brand2); border:1.5px solid var(--brand); }
-  .btn.block { width:100%; }
-  .hidden { display:none !important; }
-  /* Portada */
-  .hero { text-align:center; padding:26px 10px 8px; }
-  .hero h2 { font-size:28px; margin:0 0 8px; color:var(--ink); text-transform:none; letter-spacing:0; }
-  .hero p { font-size:17px; color:var(--gray); max-width:640px; margin:0 auto 6px; }
-  .tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:18px; }
-  .tile { background:#fff; border:1px solid var(--line); border-radius:18px; padding:20px; cursor:pointer; transition:.15s; text-align:left; }
-  .tile:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(15,118,110,.15); border-color:var(--brand); }
-  .tile .n { width:38px; height:38px; border-radius:50%; background:var(--brand); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; margin-bottom:10px; }
-  .tile h3 { margin:0 0 6px; font-size:18px; } .tile p { margin:0; color:var(--gray); font-size:14px; }
-  .clientes-demo { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-  .cd { display:flex; gap:12px; align-items:center; padding:12px; border:1px solid var(--line); border-radius:12px; cursor:pointer; background:#fff; }
-  .cd:hover { border-color:var(--brand); }
-  .cd .ic { width:40px; height:40px; border-radius:10px; background:#ccfbf1; display:flex; align-items:center; justify-content:center; font-size:20px; flex:none; }
-  .cd b { display:block; } .cd span { font-size:13px; color:var(--gray); }
-  /* QR público */
-  .estado { display:flex; align-items:center; gap:14px; padding:16px; border-radius:14px; margin-bottom:14px; }
-  .estado.ok { background:#dcfce7; border:1.5px solid #86efac; } .estado.warn { background:#fef3c7; border:1.5px solid #fcd34d; }
-  .estado .big { font-size:34px; }
-  .estado b { font-size:19px; display:block; }
-  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
-  .stat { background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px; text-align:center; }
-  .stat b { display:block; font-size:22px; color:var(--brand2); } .stat span { font-size:12px; color:var(--gray); }
-  .kv { display:grid; grid-template-columns:160px 1fr; gap:6px 12px; font-size:15px; }
-  .kv div:nth-child(odd) { color:var(--gray); }
-  .chips { display:flex; flex-wrap:wrap; gap:6px; }
-  .chip { font-size:13px; padding:4px 10px; border-radius:20px; background:#f1f5f9; border:1px solid var(--line); }
-  .lvl { font-size:12px; font-weight:700; padding:3px 9px; border-radius:20px; }
-  .lvl.n0 { background:#dcfce7; color:#166534; } .lvl.n1 { background:#e0f2fe; color:#075985; } .lvl.n2 { background:#fef3c7; color:#92400e; } .lvl.n3 { background:#fee2e2; color:#991b1b; }
-  .plagas { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
-  .plaga { border:1px solid var(--line); border-radius:12px; padding:10px 6px; text-align:center; font-size:13px; }
-  .plaga .e { font-size:24px; display:block; margin-bottom:4px; }
-  .hist { border-left:3px solid var(--brand); margin-left:8px; padding-left:16px; }
-  .hi { position:relative; padding:10px 0 14px; border-bottom:1px dashed var(--line); }
-  .hi::before { content:''; position:absolute; left:-24px; top:16px; width:13px; height:13px; border-radius:50%; background:#fff; border:3px solid var(--brand); }
-  .hi.nuevo::before { background:var(--acc); border-color:var(--acc); }
-  .hi .t { display:flex; align-items:center; gap:10px; flex-wrap:wrap; } .hi .t b { font-size:16px; }
-  .hi .d { font-size:14px; color:var(--gray); margin-top:3px; }
-  .hi button { margin-left:auto; font-size:14px; padding:7px 12px; border-radius:9px; border:1.5px solid var(--brand); background:#fff; color:var(--brand2); font-weight:700; cursor:pointer; }
-  .badge-new { background:var(--acc); color:#111; font-size:11px; font-weight:800; padding:2px 8px; border-radius:20px; }
-  .inspector { background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:14px; padding:14px; display:flex; gap:12px; align-items:center; font-size:15px; }
-  #mapaQR, #mapaT { width:100%; height:230px; border-radius:12px; border:1px solid var(--line); background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:var(--gray); font-size:14px; }
-  a.ir { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:10px; padding:13px; border-radius:12px; background:#1a73e8; color:#fff; font-weight:700; font-size:17px; text-decoration:none; }
-  /* Formulario */
-  label.f { display:block; font-size:13px; color:var(--gray); margin:10px 0 4px; }
-  input[type=text], input[type=number], input[type=date], input[type=time], input[type=password], textarea, select { width:100%; font-size:17px; padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; }
-  textarea { min-height:80px; }
-  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:0 14px; } .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0 14px; }
-  .sel { display:flex; flex-wrap:wrap; gap:8px; }
-  .opt { padding:11px 14px; border:1.5px solid var(--line); border-radius:12px; cursor:pointer; user-select:none; font-size:15px; background:#fff; }
-  .opt.on { border-color:var(--brand); background:#ccfbf1; font-weight:700; }
-  table.pl { width:100%; border-collapse:collapse; font-size:14px; }
-  table.pl th { text-align:left; font-size:12px; color:var(--gray); padding:6px; }
-  table.pl td { padding:6px; border-top:1px solid var(--line); }
-  table.pl .lvls { display:flex; gap:4px; }
-  table.pl .lvls span { padding:6px 9px; border:1.5px solid var(--line); border-radius:8px; cursor:pointer; font-size:12px; }
-  table.pl .lvls span.on.n0 { background:#dcfce7; border-color:#22c55e; } table.pl .lvls span.on.n1 { background:#e0f2fe; border-color:#0ea5e9; }
-  table.pl .lvls span.on.n2 { background:#fef3c7; border-color:#f59e0b; } table.pl .lvls span.on.n3 { background:#fee2e2; border-color:#ef4444; }
-  .prod { display:grid; grid-template-columns:2fr 1fr auto; gap:8px; margin-bottom:8px; }
-  .prod button { border:1px solid var(--line); background:#fff; border-radius:8px; padding:0 12px; cursor:pointer; }
-  canvas.firma { width:100%; height:150px; border:2px dashed #94a3b8; border-radius:12px; background:#fff; touch-action:none; }
-  .foto { height:150px; border:2px dashed var(--line); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--gray); font-size:14px; overflow:hidden; position:relative; background:#fff; text-align:center; cursor:pointer; }
-  .foto img { width:100%; height:100%; object-fit:cover; } .foto input { position:absolute; inset:0; opacity:0; }
-  .small { font-size:13px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; }
-  .err { color:var(--bad); font-weight:700; margin:8px 0; }
-  .pin { max-width:400px; margin:40px auto; text-align:center; }
-  .pin input { text-align:center; font-size:30px; letter-spacing:10px; }
-  /* Stickers */
-  .stk { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-  .sticker { background:#fff; border:2px solid var(--brand); border-radius:18px; padding:14px; text-align:center; }
-  .sticker .h { background:var(--brand); color:#fff; margin:-14px -14px 10px; border-radius:15px 15px 0 0; padding:8px; font-weight:800; font-size:14px; }
-  .sticker .qr { display:flex; justify-content:center; margin:6px 0; }
-  .sticker b { display:block; font-size:14px; } .sticker span { font-size:12px; color:var(--gray); }
-  footer { text-align:center; color:var(--gray); font-size:13px; padding:24px 10px 40px; }
-  footer b { color:var(--brand2); }
-  #toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#111827; color:#fff; padding:12px 18px; border-radius:12px; font-size:15px; z-index:60; box-shadow:0 8px 24px rgba(0,0,0,.25); max-width:90vw; text-align:center; }
-  #overlay { position:fixed; inset:0; background:rgba(255,255,255,.92); display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:50; font-size:19px; color:var(--brand2); }
-  .spin { width:52px; height:52px; border:6px solid #ccfbf1; border-top-color:var(--brand); border-radius:50%; animation:s 1s linear infinite; margin-bottom:14px; }
-  @keyframes s { to { transform:rotate(360deg); } }
-  @media (max-width:760px) { .tiles,.stk { grid-template-columns:1fr; } .clientes-demo,.g2,.g3 { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); } .plagas { grid-template-columns:repeat(3,1fr); } .kv { grid-template-columns:1fr; } }
-  @media print { .demo-bar, header.top, footer, .noprint { display:none !important; } body { background:#fff; } .stk { grid-template-columns:repeat(3,1fr); } .sticker { break-inside:avoid; } }
+body{margin:0;background-color:#F4F7FB}
+body > *:not(#tarjeta-ap):not(.wrap):not(script){display:none!important}
+.wrap *{box-sizing:border-box;margin:0;padding:0}
+.wrap{--navy:#011E41;--blue:#0067FD;--green:#2E9D5B;--soft:#F4F7FB;--line:#E4EAF2;--gray:#5E7190;
+  font-family:Poppins,system-ui,sans-serif;color:var(--navy);-webkit-font-smoothing:antialiased;background:var(--soft);min-height:100vh}
+.wrap a{color:inherit}
+.demo{background:var(--navy);color:#BFD3F2;font-size:12px;text-align:center;padding:7px 12px}
+.demo b{color:#fff}
+.in{max-width:520px;margin:0 auto;padding:22px 18px 40px}
+header.hd{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+header.hd img{height:30px}
+header.hd span{font-weight:800;font-size:16px}
+header.hd span b{color:var(--blue)}
+h1{font-size:26px;line-height:1.2;font-weight:800;letter-spacing:-.4px}
+.lead{color:var(--gray);font-size:15px;margin-top:8px;line-height:1.5}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0 24px}
+.step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 10px;text-align:center}
+.step i{display:flex;width:40px;height:40px;margin:0 auto 8px;border-radius:12px;background:#EAF2FF;align-items:center;justify-content:center}
+.step i svg{width:20px;height:20px}
+.step b{display:block;font-size:12.5px;line-height:1.3}
+.step span{display:block;font-size:11px;color:var(--gray);margin-top:3px;line-height:1.35}
+.tabs{display:flex;background:#E8EEF6;border-radius:14px;padding:4px;margin-bottom:14px}
+.tabs button{flex:1;border:0;background:transparent;font-family:inherit;font-size:14px;font-weight:600;color:var(--gray);padding:10px 6px;border-radius:11px;cursor:pointer}
+.tabs button.on{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(1,30,65,.08)}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 6px 24px rgba(1,30,65,.05)}
+.hidden{display:none!important}
+.eq{display:flex;align-items:center;gap:12px}
+.eq .ic{width:46px;height:46px;border-radius:14px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex:none}
+.eq .ic svg{width:24px;height:24px}
+.eq b{display:block;font-size:17px}.eq small{color:var(--gray);font-size:13px}
+.status{display:flex;align-items:center;gap:10px;margin:16px 0;background:#EAF7EF;border-radius:14px;padding:12px 14px}
+.status .dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(46,157,91,.18);flex:none}
+.status b{color:#1E7A45;font-size:15px}.status span{display:block;font-size:13px;color:#3D6B52}
+.sec{font-size:11.5px;font-weight:700;letter-spacing:.8px;color:var(--gray);text-transform:uppercase;margin:18px 0 10px}
+.last{border:1px solid var(--line);border-radius:14px;padding:14px}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:6px 10px;font-size:14px}
+.kv dt{color:var(--gray)}.kv dd{font-weight:500}
+.note{margin-top:10px;font-size:14px;line-height:1.5;color:#2B4366;background:var(--soft);border-radius:10px;padding:10px 12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;padding:13px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn svg{width:18px;height:18px}
+.btn.p{background:var(--blue);color:#fff}
+.btn.o{background:#fff;color:var(--blue);border:1.5px solid #CFE0FF}
+.btn.g{background:#25A244;color:#fff}
+.mt{margin-top:12px}
+.hist{list-style:none}
+.hist li{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.hist li:first-child{border-top:0}
+.hist .d{width:46px;text-align:center;flex:none;line-height:1.1}
+.hist .d b{display:block;font-size:17px}.hist .d small{font-size:11px;color:var(--gray);text-transform:uppercase}
+.hist .t{flex:1;min-width:0}.hist .t b{display:block;font-size:14px}.hist .t span{font-size:12.5px;color:var(--gray)}
+.hist button{border:0;background:#EEF4FF;color:var(--blue);font-family:inherit;font-weight:700;font-size:12px;border-radius:9px;padding:7px 10px;cursor:pointer}
+.new{background:#FFF5D6;color:#8A6100;font-size:10px;font-weight:800;border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:middle}
+/* Técnico */
+.lbl{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{border:1.5px solid var(--line);border-radius:12px;padding:9px 13px;font-size:14px;cursor:pointer;user-select:none}
+.chips span.on{border-color:var(--blue);background:#EEF4FF;color:var(--blue);font-weight:600}
+.wrap textarea,.wrap input[type=text]{width:100%;font-family:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;color:var(--navy);background:#fff}
+.wrap textarea{min-height:84px;resize:vertical}
+.foto{display:flex;align-items:center;justify-content:center;gap:8px;height:86px;border:1.5px dashed #C9D6E8;border-radius:12px;color:var(--gray);font-size:14px;position:relative;overflow:hidden;cursor:pointer}
+.foto input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+canvas.firma{width:100%;height:120px;border:1.5px dashed #C9D6E8;border-radius:12px;background:#fff;touch-action:none;display:block}
+.row{display:flex;justify-content:space-between;align-items:center}
+.row a{font-size:12.5px;color:var(--blue);cursor:pointer;text-decoration:none;font-weight:600}
+.err{color:#C62828;font-size:13px;font-weight:600;margin-top:10px;min-height:1px}
+/* Sticker */
+.stk{display:flex;gap:16px;align-items:center}
+.sticker{width:150px;flex:none;border-radius:16px;border:2px solid var(--navy);overflow:hidden;text-align:center;background:#fff}
+.sticker .h{background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:6px}
+.sticker .q{padding:10px 10px 4px;display:flex;justify-content:center}
+.sticker .q img,.sticker .q canvas{width:104px!important;height:104px!important}
+.sticker small{display:block;font-size:10.5px;color:var(--gray);padding:0 8px 9px;line-height:1.3}
+.stk p{font-size:14px;color:var(--gray);line-height:1.5}.stk p b{color:var(--navy)}
+.cta{margin-top:26px;background:var(--navy);color:#fff;border-radius:20px;padding:22px;text-align:center}
+.cta h3{font-size:19px;font-weight:800}.cta p{font-size:14px;color:#BFD3F2;margin:6px 0 16px;line-height:1.5}
+.foot{text-align:center;font-size:12px;color:#8DA0BD;margin-top:20px}.foot a{color:var(--blue);font-weight:600;text-decoration:none}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;font-size:14px;padding:12px 18px;border-radius:12px;opacity:0;transition:.3s;pointer-events:none;z-index:9;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.hl{animation:hl 1.6s ease}
+@keyframes hl{0%{background:#FFF5D6}100%{background:transparent}}
+@media (max-width:380px){h1{font-size:23px}.step span{display:none}}
 </style>
 </head>
 <body>
-<div class="demo-bar">🧪 <b>DEMOSTRACIÓN</b> · Empresa y clientes ficticios · Nada de lo que llenes se guarda</div>
-<header class="top">
-  <div class="logo"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z" fill="#0f766e"/><path d="m8.5 12.2 2.4 2.4 4.8-5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  <div><h1>Fumigaciones Demo PR</h1><div class="sub" id="hsub">Historial QR de servicios</div></div>
-  <span class="sp"></span>
-  <button id="btnInicio" onclick="go('#/')">⌂ Inicio</button>
-</header>
+<div class="wrap">
+<div class="demo"><b>DEMO</b> · Datos de ejemplo · Nada de lo que llenes se guarda</div>
+<div class="in">
+  <header class="hd"><img src="https://raw.githubusercontent.com/automatiza-pr/videos-publicos/main/tarjeta/isotipo_claro.png" alt=""><span>Automatiza <b>PR</b></span></header>
 
-<main id="vInicio">
-  <div class="hero">
-    <h2>Así funciona el Historial QR</h2>
-    <p>Cada cliente tiene un código QR pegado en su local. Al escanearlo se ve todo su historial de fumigación: certificados, productos usados y el próximo servicio. Ideal para enseñárselo al inspector de Salud.</p>
-  </div>
-  <div class="tiles">
-    <div class="tile" onclick="go('#/qr/FD-101')"><div class="n">1</div><h3>📱 Lo que ve el cliente</h3><p>Escanea el QR del local y ve el estado del servicio, el último reporte y todo el historial en PDF.</p></div>
-    <div class="tile" onclick="go('#/tecnico/FD-101')"><div class="n">2</div><h3>🧾 Lo que llena el técnico</h3><p>Desde la tablet: mapa para llegar, plagas encontradas, productos, fotos y firma. Genera el PDF al instante.</p></div>
-    <div class="tile" onclick="go('#/stickers')"><div class="n">3</div><h3>🏷️ Stickers QR</h3><p>La hoja de stickers lista para imprimir y pegar en cada cliente.</p></div>
-  </div>
-  <div class="card" style="margin-top:18px">
-    <h2>Clientes de ejemplo</h2>
-    <p class="muted" style="margin-top:-6px">Toca cualquiera para ver su página del QR.</p>
-    <div class="clientes-demo" id="listaClientes"></div>
-  </div>
-  <div class="card">
-    <h2>Prueba recomendada (2 minutos)</h2>
-    <ol style="margin:0;padding-left:20px;line-height:1.8">
-      <li>Abre <b>“Lo que llena el técnico”</b> y entra con el PIN <b>1234</b>.</li>
-      <li>Marca lo que encontraste, firma y toca <b>Guardar</b>: se crea el PDF.</li>
-      <li>Toca <b>“Ver el QR del cliente”</b>: tu reporte ya aparece de primero en el historial.</li>
-    </ol>
-  </div>
-</main>
+  <h1>Historial QR</h1>
+  <p class="lead">Cada equipo o local lleva un QR. Al escanearlo, tu cliente ve todos los servicios que le has hecho, con su reporte en PDF.</p>
 
-<main id="vQR" class="hidden"></main>
-
-<main id="vTec" class="hidden">
-  <div class="card pin" id="pinBox">
-    <h2>Acceso de técnicos</h2>
-    <p class="muted">PIN de la demo: <b>1234</b></p>
-    <input type="password" id="pin" inputmode="numeric" placeholder="PIN">
-    <div class="err" id="pinErr"></div>
-    <button class="btn pri block" onclick="entrar()">Entrar</button>
+  <div class="steps">
+    <div class="step"><i><svg viewBox="0 0 24 24" fill="none" stroke="#0067FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg></i><b>1. Se pega el QR</b><span>En el equipo o en el local</span></div>
+    <div class="step"><i><svg viewBox="0 0 24 24" fill="none" stroke="#0067FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 6h4M9 12l2 2 4-4"/></svg></i><b>2. Se registra</b><span>Desde su celular, en 1 minuto</span></div>
+    <div class="step"><i><svg viewBox="0 0 24 24" fill="none" stroke="#0067FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg></i><b>3. Lo escanean</b><span>Historial y PDF al escanear</span></div>
   </div>
-  <div id="form" class="hidden">
-    <div class="card">
-      <h2>Cliente</h2>
-      <select id="selCliente" onchange="go('#/tecnico/'+this.value)"></select>
-      <div class="kv" style="margin-top:12px" id="tCliente"></div>
-    </div>
-    <div class="card" style="background:#f0fdfa;border-color:#99f6e4">
-      <h2>📍 Ubicación del establecimiento</h2>
-      <div id="mapaT">Cargando mapa…</div>
-      <a class="ir" id="irT" target="_blank" rel="noopener">➤ Cómo llegar con Google Maps</a>
-      <button class="small" style="margin-top:10px" onclick="miUbicacion()">📡 Usar mi ubicación actual</button>
-      <span class="muted" id="gpsNota" style="margin-left:8px"></span>
-    </div>
-    <div class="card">
-      <h2>Servicio</h2>
-      <div class="g3">
-        <div><label class="f">Técnico</label><input type="text" id="tecnico" value="Pedro Ortiz"></div>
-        <div><label class="f">Fecha</label><input type="date" id="fecha"></div>
-        <div><label class="f">Hora</label><input type="time" id="hora"></div>
-      </div>
-      <label class="f">Tipo de servicio</label>
-      <div class="sel" id="tipo"></div>
-      <label class="f">Áreas tratadas</label>
-      <div class="sel" id="areas"></div>
-    </div>
-    <div class="card">
-      <h2>Plagas encontradas</h2>
-      <table class="pl"><thead><tr><th>Plaga</th><th>Nivel de actividad</th></tr></thead><tbody id="plagasT"></tbody></table>
-    </div>
-    <div class="card">
-      <h2>Productos aplicados</h2>
-      <div id="prods"></div>
-      <button class="small" onclick="addProd()">+ Añadir producto</button>
-      <div class="g2" style="margin-top:6px">
-        <div><label class="f">Estaciones de roedores revisadas</label><input type="number" id="estRev" value="8"></div>
-        <div><label class="f">Estaciones con consumo</label><input type="number" id="estCon" value="1"></div>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Recomendaciones al cliente</h2>
-      <div class="sel" id="recs"></div>
-      <label class="f">Observaciones</label>
-      <textarea id="obs" placeholder="Ej.: Se selló hueco detrás de la nevera. Mantener la basura tapada."></textarea>
-      <label class="f">Próximo servicio</label>
-      <input type="date" id="proximo">
-    </div>
-    <div class="card">
-      <h2>Fotos y firmas</h2>
-      <div class="g2">
-        <div><label class="f">Foto antes</label><label class="foto"><span>📷 Tocar para foto</span><input type="file" accept="image/*" capture="environment" onchange="foto(this,'antes')"></label></div>
-        <div><label class="f">Foto después</label><label class="foto"><span>📷 Tocar para foto</span><input type="file" accept="image/*" capture="environment" onchange="foto(this,'despues')"></label></div>
-      </div>
-      <div class="g2">
-        <div><label class="f">Firma del cliente <button class="small" onclick="borrar(0)">Borrar</button></label><canvas class="firma" id="firma0"></canvas></div>
-        <div><label class="f">Firma del técnico <button class="small" onclick="borrar(1)">Borrar</button></label><canvas class="firma" id="firma1"></canvas></div>
-      </div>
-    </div>
-    <div class="err" id="formErr"></div>
-    <button class="btn pri block" onclick="guardar()">Guardar servicio y generar PDF</button>
-    <p class="muted" style="text-align:center">En la versión real se guarda el PDF, se le envía al cliente y queda en el historial del QR.</p>
-  </div>
-  <div id="listo" class="hidden">
-    <div class="card" style="text-align:center;padding:34px 18px">
-      <div style="font-size:54px">✅</div>
-      <h2 style="text-transform:none;font-size:24px;color:var(--ok)">Servicio guardado</h2>
-      <p id="listoMsg" style="font-size:17px"></p>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn acc" onclick="verPdf(NUEVO)">📄 Ver el PDF</button>
-        <button class="btn pri" onclick="go('#/qr/'+NUEVO.cliente)">📱 Ver el QR del cliente</button>
-      </div>
-    </div>
-  </div>
-</main>
 
-<main id="vStk" class="hidden">
-  <div class="card noprint" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <div style="flex:1"><h2 style="margin:0">Stickers QR</h2><span class="muted">Uno por cliente. Se imprimen en papel adhesivo y se pegan cerca de la entrada o de la cocina.</span></div>
-    <button class="btn pri" onclick="window.print()">🖨️ Imprimir</button>
+  <div class="tabs"><button id="tCli" class="on" onclick="tab('cli')">Lo que ve tu cliente</button><button id="tTec" onclick="tab('tec')">Lo que llena el técnico</button></div>
+
+  <!-- Vista del cliente -->
+  <div id="vCli" class="card">
+    <div class="eq">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></svg></div>
+      <div><b>Equipo #A-104</b><small>Oficina de ejemplo · Juan del Pueblo</small></div>
+    </div>
+    <div class="status"><div class="dot"></div><div><b>Servicio al día</b><span id="prox"></span></div></div>
+
+    <div class="sec">Último servicio</div>
+    <div class="last" id="last"></div>
+    <button class="btn p mt" onclick="verPdf(H[0])"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3"/></svg>Ver reporte en PDF</button>
+
+    <div class="sec">Historial</div>
+    <ul class="hist" id="hist"></ul>
   </div>
-  <div class="stk" id="stk"></div>
-</main>
 
-<footer>Sistema <b>Historial QR</b> creado por <b>Automatiza PR</b> · automatizacrm.com</footer>
-<div id="toast" class="hidden"></div>
-<div id="overlay" class="hidden"><div class="spin"></div><div>Generando el reporte…</div></div>
+  <!-- Vista del técnico -->
+  <div id="vTec" class="card hidden">
+    <div class="eq">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></svg></div>
+      <div><b>Nuevo servicio</b><small>Equipo #A-104 · Oficina de ejemplo</small></div>
+    </div>
+    <label class="lbl">Tipo de servicio</label>
+    <div class="chips" id="tipos"><span class="on">Mantenimiento</span><span>Reparación</span><span>Instalación</span><span>Inspección</span></div>
+    <label class="lbl">¿Qué se hizo?</label>
+    <textarea id="desc">Limpieza general y revisión. Todo funcionando bien.</textarea>
+    <label class="lbl">Técnico</label>
+    <input type="text" id="tec" value="Pedro Ortiz">
+    <label class="lbl">Foto (opcional)</label>
+    <label class="foto" id="fotoBox"><span>📷 Tocar para tomar foto</span><input type="file" accept="image/*" capture="environment" onchange="foto(this)"></label>
+    <div class="row"><label class="lbl">Firma del cliente</label><a onclick="borrar()">Borrar</a></div>
+    <canvas class="firma" id="firma"></canvas>
+    <div class="err" id="err"></div>
+    <button class="btn p mt" onclick="guardar()">Guardar servicio</button>
+  </div>
 
+  <div class="sec" style="margin-top:26px">El sticker</div>
+  <div class="card stk">
+    <div class="sticker"><div class="h">HISTORIAL DE SERVICIO</div><div class="q" id="qr"></div><small>Escanee para ver los servicios de este equipo</small></div>
+    <p><b>Se pega en el equipo o en el local.</b> Lo escanea el cliente, un inspector o el próximo técnico, y ve todo sin llamar a nadie.</p>
+  </div>
+
+  <div class="cta">
+    <h3>¿Lo quieres para tu negocio?</h3>
+    <p>Lo montamos con tu logo, tus clientes y tus servicios. Funciona para aires, fumigación, piscinas, mantenimiento y más.</p>
+    <a class="btn g" href="https://wa.me/19392545301?text=Hola%2C%20vi%20el%20demo%20del%20Historial%20QR%20y%20quiero%20informaci%C3%B3n."><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.6A8.4 8.4 0 1 1 21 11.5z"/></svg>Escríbeme por WhatsApp</a>
+  </div>
+  <div class="foot">Hecho por <a href="https://automatizacrm.com/tarjeta">Automatiza PR</a> · automatizacrm.com</div>
+</div>
+</div>
+<div id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
-const GKEY = 'AIzaSyB-cyjnluqqHry89MTUsnNeK78YC2-XO-g';
-const EMP = { nombre:'Fumigaciones Demo PR', tel:'(787) 000-0000', lic:'Licencia de Salud Ambiental #0000 (demo)', email:'servicio@fumigacionesdemo.pr' };
-const hoy = new Date(); const dd = n => { const d = new Date(hoy); d.setDate(d.getDate()+n); return d; };
-const iso = d => d.toLocaleDateString('en-CA');
-const larga = d => new Date(typeof d==='string' ? d+'T12:00' : d).toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'});
-const PLAGAS = [['cucarachas','Cucarachas','🪳'],['roedores','Roedores','🐀'],['hormigas','Hormigas','🐜'],['moscas','Moscas','🪰'],['termitas','Termitas','🐛']];
-const NIV = ['Ninguna','Baja','Media','Alta'];
-const TIPOS = ['Fumigación general','Control de roedores','Tratamiento de termitas','Desinfección','Control de mosquitos'];
-const AREAS = ['Cocina','Almacén','Comedor','Baños','Oficinas','Área de basura','Drenajes','Exterior / perímetro'];
-const RECS = ['Mantener la basura tapada','Sellar grietas y huecos','No dejar comida expuesta de noche','Limpiar debajo de los equipos','Reparar filtración de agua','Mantener puertas cerradas'];
-const CLI = [
-  { id:'FD-101', n:'Restaurante La Esquina Criolla', ic:'🍽️', dir:'Calle Principal 123, Isabela, PR 00662', lat:18.5003, lng:-67.0244, c:'Juan del Pueblo', tel:'787-555-0101', f:'Mensual' },
-  { id:'FD-102', n:'Panadería Dulce Hogar', ic:'🥐', dir:'Ave. Los Robles 45, Aguadilla, PR 00603', lat:18.4274, lng:-67.1541, c:'María Santiago', tel:'787-555-0102', f:'Mensual' },
-  { id:'FD-103', n:'Colegio Nuevo Amanecer', ic:'🏫', dir:'Carr. 2 Km 85, Hatillo, PR 00659', lat:18.4864, lng:-66.8254, c:'Ana Morales', tel:'787-555-0103', f:'Bimestral' },
-  { id:'FD-104', n:'Supermercado El Ahorro', ic:'🛒', dir:'Calle Comercio 7, Arecibo, PR 00612', lat:18.4724, lng:-66.7157, c:'Luis Torres', tel:'787-555-0104', f:'Quincenal' },
-  { id:'FD-105', n:'Hotel Brisas del Oeste', ic:'🏨', dir:'Carr. 413 Km 2, Rincón, PR 00677', lat:18.3402, lng:-67.2499, c:'Carmen Rivera', tel:'787-555-0105', f:'Mensual' },
-  { id:'FD-106', n:'Cafetería Universitaria', ic:'☕', dir:'Calle Post 300, Mayagüez, PR 00680', lat:18.2013, lng:-67.1397, c:'José Vega', tel:'787-555-0106', f:'Mensual' }
+var hoy=new Date();
+function dd(n){var d=new Date(hoy);d.setDate(d.getDate()+n);return d;}
+function larga(d){return d.toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'});}
+function mes(d){return d.toLocaleDateString('es-PR',{month:'short'}).replace('.','');}
+var num=1048;
+var H=[
+ {n:num--,f:dd(-12),tipo:'Mantenimiento',tec:'Pedro Ortiz',desc:'Limpieza de filtros y revisión general. Equipo funcionando bien.'},
+ {n:num--,f:dd(-75),tipo:'Reparación',tec:'Sofía Colón',desc:'Cambio de pieza dañada. Se probó y quedó funcionando.'},
+ {n:num--,f:dd(-140),tipo:'Mantenimiento',tec:'Pedro Ortiz',desc:'Mantenimiento preventivo. Sin novedad.'},
+ {n:num--,f:dd(-230),tipo:'Instalación',tec:'Luis Torres',desc:'Instalación del equipo y orientación al cliente.'}
 ];
-const TEC = ['Pedro Ortiz','Sofía Colón','Pedro Ortiz','Luis Torres'];
-// Historial ficticio
-const HIST = {};
-CLI.forEach((c,ci) => {
-  HIST[c.id] = [0,1,2,3,4].map(k => {
-    const fecha = dd(-(12 + k*30 + ci*2));
-    const base = (k + ci) % 4;
-    const pl = { cucarachas:[1,0,2,1][base], roedores:[0,1,0,0][base], hormigas:[1,1,0,2][base], moscas:[0,0,1,0][base], termitas:0 };
-    return { num: 2480 - ci*7 - k*31, cliente:c.id, fecha:iso(fecha), hora:['08:30','09:15','10:00','07:45'][base], tecnico:TEC[(k+ci)%4],
-      tipo:[k===2 && ci%2 ? 'Control de roedores':'Fumigación general'], areas:['Cocina','Almacén','Área de basura','Drenajes'].slice(0,2+base%3),
-      plagas:pl, prods:[['Gel cebo para cucarachas (indoxacarb 0.6%)','30 g'],['Insecticida residual microencapsulado','1 galón diluido'],['Bloques de cebo para roedores','8 estaciones']].slice(0, 2+(base%2)),
-      est:[8,1-(base%2)], recs:[RECS[base], RECS[(base+2)%6]], obs:['Sin novedad. Áreas limpias y en orden.','Se observó actividad leve debajo del fregadero; se reforzó con gel.','Se selló hueco detrás de la nevera.','Hormigas en el perímetro; se trató el exterior.'][base],
-      proximo:iso(dd(-(12 + k*30 + ci*2) + 30)), firmado:true };
-  });
-});
-let NUEVO = null, PIN_OK = false, S = {}, firmas = [], firmaHecha = [false,false];
-const $ = i => document.getElementById(i);
-function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function toast(t){ const e=$('toast'); e.textContent=t; e.classList.remove('hidden'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.add('hidden'),3200); }
-function go(h){ if (location.hash===h) route(); else location.hash=h; }
-window.addEventListener('hashchange', route);
-function cli(id){ return CLI.find(c=>c.id===id) || CLI[0]; }
-
-// ---------- Router ----------
-function route(){
-  const p = (location.hash||'#/').slice(2).split('/');
-  ['vInicio','vQR','vTec','vStk'].forEach(v=>$(v).classList.add('hidden'));
-  window.scrollTo(0,0);
-  if (p[0]==='qr') { $('vQR').classList.remove('hidden'); pintarQR(cli(p[1])); }
-  else if (p[0]==='tecnico') { $('vTec').classList.remove('hidden'); abrirTec(cli(p[1])); }
-  else if (p[0]==='stickers') { $('vStk').classList.remove('hidden'); pintarStk(); $('hsub').textContent='Stickers QR'; }
-  else { $('vInicio').classList.remove('hidden'); $('hsub').textContent='Historial QR de servicios'; }
+function $(i){return document.getElementById(i);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function pintar(){
+  var u=H[0], p=new Date(u.f); p.setDate(p.getDate()+90);
+  $('prox').textContent='Próximo servicio: '+larga(p);
+  $('last').innerHTML='<dl class="kv"><dt>Fecha</dt><dd>'+larga(u.f)+'</dd><dt>Servicio</dt><dd>'+esc(u.tipo)+'</dd><dt>Técnico</dt><dd>'+esc(u.tec)+'</dd></dl><div class="note">'+esc(u.desc)+'</div>';
+  $('hist').innerHTML=H.map(function(h,i){return '<li'+(h.nuevo?' class="hl"':'')+'><div class="d"><b>'+h.f.getDate()+'</b><small>'+mes(h.f)+'</small></div><div class="t"><b>'+esc(h.tipo)+(h.nuevo?'<span class="new">NUEVO</span>':'')+'</b><span>'+esc(h.tec)+' · Reporte #'+h.n+'</span></div><button onclick="verPdf(H['+i+'])">PDF</button></li>';}).join('');
 }
-$('listaClientes').innerHTML = CLI.map(c=>'<div class="cd" onclick="go(\'#/qr/'+c.id+'\')"><div class="ic">'+c.ic+'</div><div><b>'+esc(c.n)+'</b><span>'+esc(c.dir.split(',').slice(-2,-1)[0].trim())+' · servicio '+c.f.toLowerCase()+'</span></div></div>').join('');
-
-// ---------- Página del QR (lo que ve el cliente) ----------
-function pintarQR(c){
-  $('hsub').textContent = c.id + ' · ' + c.n;
-  const H = HIST[c.id]; const u = H[0];
-  const prox = new Date(u.proximo+'T12:00'); const dias = Math.round((prox - hoy)/864e5);
-  const ok = dias >= 0;
-  const maxN = k => Math.max(...H.map(h=>h.plagas[k]));
-  $('vQR').innerHTML = `
-  <div class="estado ${ok?'ok':'warn'}"><span class="big">${ok?'✅':'⚠️'}</span><div><b>${ok?'Servicio al día':'Servicio pendiente'}</b>
-    <span>${ok ? 'Próximo servicio: '+larga(u.proximo)+' ('+(dias===0?'hoy':'en '+dias+' día'+(dias===1?'':'s'))+')' : 'Debió hacerse el '+larga(u.proximo)}</span></div></div>
-  <div class="card">
-    <div style="display:flex;gap:14px;align-items:center"><div style="font-size:40px">${c.ic}</div><div><div style="font-size:22px;font-weight:800">${esc(c.n)}</div><div class="muted">${esc(c.dir)}</div></div></div>
-  </div>
-  <div class="stats">
-    <div class="stat"><b>${H.length}</b><span>servicios registrados</span></div>
-    <div class="stat"><b>${larga(u.fecha).replace(/ de \d{4}$/,'')}</b><span>último servicio</span></div>
-    <div class="stat"><b>${esc(c.f)}</b><span>frecuencia</span></div>
-    <div class="stat"><b>${H.reduce((a,h)=>a+h.est[0],0)}</b><span>estaciones revisadas</span></div>
-  </div>
-  <div class="inspector noprint"><span style="font-size:28px">🏛️</span><div><b>¿Inspector de Salud?</b> Aquí está el historial completo de control de plagas de este establecimiento, con cada reporte en PDF firmado por el técnico licenciado.</div></div>
-  <div class="card" style="margin-top:14px">
-    <h2>Último servicio · ${larga(u.fecha)}</h2>
-    <div class="kv">
-      <div>Técnico</div><div><b>${esc(u.tecnico)}</b></div>
-      <div>Tipo de servicio</div><div>${u.tipo.map(esc).join(', ')}</div>
-      <div>Áreas tratadas</div><div class="chips">${u.areas.map(a=>'<span class="chip">'+esc(a)+'</span>').join('')}</div>
-      <div>Productos</div><div>${u.prods.map(p=>esc(p[0])+' <span class="muted">('+esc(p[1])+')</span>').join('<br>')}</div>
-      <div>Observaciones</div><div>${esc(u.obs)||'—'}</div>
-    </div>
-    <div style="margin-top:14px" class="plagas">${PLAGAS.map(p=>'<div class="plaga"><span class="e">'+p[2]+'</span>'+p[1]+'<br><span class="lvl n'+u.plagas[p[0]]+'">'+NIV[u.plagas[p[0]]]+'</span></div>').join('')}</div>
-    <button class="btn ghost block" style="margin-top:14px" onclick="verPdf(HIST['${c.id}'][0])">📄 Ver reporte PDF del último servicio</button>
-  </div>
-  <div class="card">
-    <h2>Historial de servicios</h2>
-    <div class="hist">${H.map((h,i)=>`<div class="hi ${h.nuevo?'nuevo':''}"><div class="t"><b>${larga(h.fecha)}</b>${h.nuevo?'<span class="badge-new">NUEVO</span>':''}<button onclick="verPdf(HIST['${c.id}'][${i}])">📄 PDF</button></div>
-      <div class="d">Reporte #${h.num} · ${esc(h.tecnico)} · ${h.tipo.map(esc).join(', ')} · ${PLAGAS.filter(p=>h.plagas[p[0]]>0).map(p=>p[2]+' '+NIV[h.plagas[p[0]]]).join('  ')||'Sin actividad de plagas'}</div></div>`).join('')}</div>
-  </div>
-  <div class="card">
-    <h2>Ubicación</h2>
-    <div id="mapaQR">Cargando mapa…</div>
-    <a class="ir" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}">➤ Cómo llegar con Google Maps</a>
-  </div>
-  <div class="g2 noprint">
-    <button class="btn acc block" onclick="toast('En la versión real, este botón le escribe a la compañía por WhatsApp para pedir un servicio.')">💬 Solicitar servicio</button>
-    <button class="btn ghost block" onclick="go('#/tecnico/${c.id}')">🧾 Abrir formulario del técnico</button>
-  </div>`;
-  conMaps(() => mapa('mapaQR', c, 15));
+function tab(t){
+  $('tCli').classList.toggle('on',t==='cli');$('tTec').classList.toggle('on',t==='tec');
+  $('vCli').classList.toggle('hidden',t!=='cli');$('vTec').classList.toggle('hidden',t!=='tec');
+  if(t==='tec') setTimeout(iniFirma,30);
 }
-
-// ---------- Mapa ----------
-let mapsListo = false, mapsCola = [];
-function conMaps(fn){
-  if (mapsListo) return fn(); mapsCola.push(fn);
-  if (window.__cargando) return; window.__cargando = true;
-  window.gm_authFailure = () => document.querySelectorAll('#mapaQR,#mapaT').forEach(e => e.textContent = 'Mapa no disponible en esta vista previa. Usa "Cómo llegar".');
-  window.__mapsOk = () => { mapsListo = true; mapsCola.splice(0).forEach(f => f()); };
-  const s = document.createElement('script'); s.async = true;
-  s.src = 'https://maps.googleapis.com/maps/api/js?key=' + GKEY + '&callback=__mapsOk&loading=async&language=es&region=PR';
-  s.onerror = () => document.querySelectorAll('#mapaQR,#mapaT').forEach(e => e.textContent = 'Mapa no disponible. Usa "Cómo llegar".');
-  document.head.appendChild(s);
+document.querySelectorAll('#tipos span').forEach(function(s){s.onclick=function(){document.querySelectorAll('#tipos span').forEach(function(x){x.classList.remove('on')});s.classList.add('on');};});
+var ctx,hay=false,FOTO=null;
+function iniFirma(){
+  var c=$('firma'),r=c.getBoundingClientRect(); if(!r.width) return;
+  c.width=r.width*2;c.height=r.height*2;ctx=c.getContext('2d');ctx.scale(2,2);ctx.lineWidth=2.4;ctx.lineCap='round';ctx.strokeStyle='#011E41';hay=false;
+  var d=false;function pos(e){var b=c.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top];}
+  c.onpointerdown=function(e){e.preventDefault();d=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p[0],p[1]);};
+  c.onpointermove=function(e){if(!d)return;e.preventDefault();var p=pos(e);ctx.lineTo(p[0],p[1]);ctx.stroke();hay=true;};
+  c.onpointerup=c.onpointerleave=function(){d=false;};
 }
-let MT = null;
-function mapa(el, c, z){
-  const box = $(el); if (!box) return;
-  const m = new google.maps.Map(box, { center:{lat:c.lat,lng:c.lng}, zoom:z, mapTypeControl:false, streetViewControl:false, fullscreenControl:true, gestureHandling:'cooperative' });
-  const mk = new google.maps.Marker({ map:m, position:{lat:c.lat,lng:c.lng} });
-  const iw = new google.maps.InfoWindow({ content:'<div style="font-family:Arial;font-size:13px"><b>'+esc(c.n)+'</b><br>'+esc(c.dir)+'</div>' });
-  iw.open({ anchor:mk, map:m });
-  return { m, mk, iw };
-}
-
-// ---------- Formulario del técnico ----------
-function entrar(){ if ($('pin').value.trim()==='1234') { PIN_OK=true; $('pinBox').classList.add('hidden'); route(); } else $('pinErr').textContent='PIN incorrecto (en la demo es 1234)'; }
-$('pin').addEventListener('keydown', e => { if (e.key==='Enter') entrar(); });
-function chips(id, arr, multi, sel){
-  $(id).innerHTML = arr.map(a=>'<div class="opt'+(sel.includes(a)?' on':'')+'">'+esc(a)+'</div>').join('');
-  [...$(id).children].forEach(el => el.onclick = () => { if (!multi) [...$(id).children].forEach(x=>x.classList.remove('on')); el.classList.toggle('on'); });
-}
-const valChips = id => [...$(id).querySelectorAll('.opt.on')].map(e=>e.textContent);
-function abrirTec(c){
-  $('hsub').textContent = 'Formulario del técnico';
-  $('listo').classList.add('hidden');
-  if (!PIN_OK) { $('pinBox').classList.remove('hidden'); $('form').classList.add('hidden'); setTimeout(()=>$('pin').focus(),50); return; }
-  $('form').classList.remove('hidden');
-  S = { cliente:c.id, fotos:{}, plagas:{cucarachas:1,roedores:0,hormigas:0,moscas:0,termitas:0} };
-  $('selCliente').innerHTML = CLI.map(x=>'<option value="'+x.id+'"'+(x.id===c.id?' selected':'')+'>'+x.id+' · '+esc(x.n)+'</option>').join('');
-  $('tCliente').innerHTML = '<div>Dirección</div><div>'+esc(c.dir)+'</div><div>Encargado</div><div>'+esc(c.c)+' · '+esc(c.tel)+'</div><div>Frecuencia</div><div>'+esc(c.f)+'</div><div>Último servicio</div><div>'+larga(HIST[c.id][0].fecha)+'</div>';
-  $('fecha').value = iso(hoy); $('hora').value = hoy.toTimeString().slice(0,5); $('proximo').value = iso(dd(30));
-  chips('tipo', TIPOS, false, ['Fumigación general']); chips('areas', AREAS, true, ['Cocina','Almacén','Área de basura']); chips('recs', RECS, true, ['Mantener la basura tapada']);
-  $('plagasT').innerHTML = PLAGAS.map(p=>'<tr><td>'+p[2]+' '+p[1]+'</td><td><div class="lvls" data-k="'+p[0]+'">'+NIV.map((n,i)=>'<span class="n'+i+(S.plagas[p[0]]===i?' on':'')+'" data-i="'+i+'">'+n+'</span>').join('')+'</div></td></tr>').join('');
-  document.querySelectorAll('.lvls').forEach(g => g.querySelectorAll('span').forEach(s => s.onclick = () => { g.querySelectorAll('span').forEach(x=>x.classList.remove('on')); s.classList.add('on'); S.plagas[g.dataset.k] = +s.dataset.i; }));
-  $('prods').innerHTML=''; addProd('Gel cebo para cucarachas (indoxacarb 0.6%)','30 g'); addProd('Insecticida residual microencapsulado','1 galón diluido');
-  $('obs').value=''; $('formErr').textContent=''; $('gpsNota').textContent='';
-  document.querySelectorAll('#form .foto').forEach(f => { f.querySelector('span').style.display=''; const im=f.querySelector('img'); if(im) im.remove(); });
-  $('irT').href = 'https://www.google.com/maps/dir/?api=1&destination='+c.lat+','+c.lng;
-  setTimeout(() => { iniFirmas(); conMaps(() => { MT = mapa('mapaT', c, 16); }); }, 60);
-}
-function addProd(n='',q=''){ const d=document.createElement('div'); d.className='prod'; d.innerHTML='<input type="text" placeholder="Producto" value="'+esc(n)+'"><input type="text" placeholder="Cantidad" value="'+esc(q)+'"><button title="Quitar">✕</button>'; d.querySelector('button').onclick=()=>d.remove(); $('prods').appendChild(d); }
-function miUbicacion(){
-  if (!navigator.geolocation) return toast('Este equipo no tiene GPS.');
-  $('gpsNota').textContent = 'Buscando…';
-  navigator.geolocation.getCurrentPosition(p => { const pos={lat:p.coords.latitude,lng:p.coords.longitude}; S.gps=pos;
-    if (MT) { MT.m.setCenter(pos); MT.mk.setPosition(pos); }
-    $('gpsNota').textContent = '✔ Ubicación tomada (±'+Math.round(p.coords.accuracy)+' m). En la versión real queda guardada.'; },
-    () => $('gpsNota').textContent = 'No se pudo leer el GPS (permite la ubicación).', { enableHighAccuracy:true, timeout:10000 });
-}
-function foto(inp, k){
-  const f=inp.files[0]; if(!f) return; const img=new Image(); const url=URL.createObjectURL(f);
-  img.onload=()=>{ const s=Math.min(1,1000/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=img.width*s; c.height=img.height*s; c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-    S.fotos[k]=c.toDataURL('image/jpeg',.72); const box=inp.parentElement; box.querySelector('span').style.display='none'; let im=box.querySelector('img'); if(!im){ im=document.createElement('img'); box.insertBefore(im,box.firstChild);} im.src=S.fotos[k]; URL.revokeObjectURL(url); };
-  img.src=url;
-}
-function iniFirmas(){
-  firmas=[0,1].map(n=>{ const c=$('firma'+n); const r=c.getBoundingClientRect(); c.width=r.width*2; c.height=r.height*2; const x=c.getContext('2d'); x.scale(2,2); x.lineWidth=2.4; x.lineCap='round'; x.strokeStyle='#0b1b3f'; firmaHecha[n]=false;
-    let d=false; const pos=e=>{const b=c.getBoundingClientRect(); return [e.clientX-b.left,e.clientY-b.top];};
-    c.onpointerdown=e=>{e.preventDefault(); d=true; const [a,b]=pos(e); x.beginPath(); x.moveTo(a,b);};
-    c.onpointermove=e=>{ if(!d) return; e.preventDefault(); const [a,b]=pos(e); x.lineTo(a,b); x.stroke(); firmaHecha[n]=true; };
-    c.onpointerup=c.onpointerleave=()=>d=false; return x; });
-}
-function borrar(n){ const c=$('firma'+n); firmas[n].clearRect(0,0,c.width,c.height); firmaHecha[n]=false; }
-function firmaImg(n){ const fc=$('firma'+n); const t=document.createElement('canvas'); t.width=500; t.height=Math.round(500*fc.height/fc.width); const x=t.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,t.width,t.height); x.drawImage(fc,0,0,t.width,t.height); return t.toDataURL('image/jpeg',.85); }
+function borrar(){var c=$('firma');ctx.clearRect(0,0,c.width,c.height);hay=false;}
+function foto(inp){var f=inp.files[0];if(!f)return;var img=new Image(),url=URL.createObjectURL(f);img.onload=function(){var s=Math.min(1,900/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=img.width*s;c.height=img.height*s;c.getContext('2d').drawImage(img,0,0,c.width,c.height);FOTO=c.toDataURL('image/jpeg',.75);var b=$('fotoBox'),im=b.querySelector('img')||document.createElement('img');im.src=FOTO;b.insertBefore(im,b.firstChild);URL.revokeObjectURL(url);};img.src=url;}
+function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('on')},3000);}
 function guardar(){
-  const err=$('formErr'); err.textContent='';
-  const tipo=valChips('tipo'), areas=valChips('areas');
-  if (!tipo.length) { err.textContent='Escoge el tipo de servicio.'; return; }
-  if (!areas.length) { err.textContent='Marca al menos un área tratada.'; return; }
-  $('overlay').classList.remove('hidden');
-  setTimeout(()=>{
-    const H = HIST[S.cliente];
-    NUEVO = { num: Math.max(...Object.values(HIST).flat().map(h=>h.num)) + 1, cliente:S.cliente, fecha:$('fecha').value, hora:$('hora').value, tecnico:$('tecnico').value||'Técnico',
-      tipo, areas, plagas:{...S.plagas}, prods:[...$('prods').children].map(d=>[...d.querySelectorAll('input')].map(i=>i.value)).filter(p=>p[0]),
-      est:[+$('estRev').value||0, +$('estCon').value||0], recs:valChips('recs'), obs:$('obs').value, proximo:$('proximo').value,
-      fotos:{...S.fotos}, firmas:[firmaHecha[0]?firmaImg(0):null, firmaHecha[1]?firmaImg(1):null], gps:S.gps, nuevo:true };
-    H.forEach(h=>delete h.nuevo); H.unshift(NUEVO);
-    $('overlay').classList.add('hidden'); $('form').classList.add('hidden'); $('listo').classList.remove('hidden');
-    $('listoMsg').innerHTML = 'Reporte <b>#'+NUEVO.num+'</b> de <b>'+esc(cli(S.cliente).n)+'</b>.<br>Ya aparece en el historial del QR del cliente.';
-    window.scrollTo(0,0);
-  }, 900);
+  var d=$('desc').value.trim(); if(!d){$('err').textContent='Escribe qué se hizo.';return;} $('err').textContent='';
+  var firma=null; if(hay){var fc=$('firma'),t=document.createElement('canvas');t.width=500;t.height=Math.round(500*fc.height/fc.width);var x=t.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,t.width,t.height);x.drawImage(fc,0,0,t.width,t.height);firma=t.toDataURL('image/jpeg',.85);}
+  H.forEach(function(h){delete h.nuevo});
+  H.unshift({n:H[0].n+1,f:new Date(),tipo:document.querySelector('#tipos .on').textContent,tec:$('tec').value||'Técnico',desc:d,firma:firma,foto:FOTO,nuevo:true});
+  pintar(); tab('cli'); window.scrollTo({top:$('vCli').getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});
+  toast('Guardado. Ya aparece en el historial del QR.');
 }
-
-// ---------- PDF ----------
 function verPdf(h){
-  const w = window.open('', '_blank');
-  try {
-    const url = URL.createObjectURL(crearPdf(h).output('blob'));
-    if (w) w.location = url; else location.href = url;
-  } catch(e) { if (w) w.close(); toast('No se pudo crear el PDF.'); }
+  var w=window.open('','_blank');
+  try{
+    var J=window.jspdf.jsPDF,doc=new J({unit:'pt',format:'letter'}),M=48,W=612,R=W-M,y;
+    doc.setFillColor(1,30,65);doc.rect(0,0,W,90,'F');
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('Reporte de servicio',M,46);
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text('Empresa de ejemplo · Demo de Automatiza PR',M,64);
+    doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text('#'+h.n,R,52,{align:'right'});
+    doc.setTextColor(1,30,65);y=130;
+    function par(k,v,x){doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(94,113,144);doc.text(k.toUpperCase(),x,y);doc.setFont('helvetica','normal');doc.setFontSize(12);doc.setTextColor(1,30,65);doc.text(v,x,y+16);}
+    par('Equipo','#A-104 · Oficina de ejemplo',M);par('Fecha',larga(h.f),330);y+=46;
+    par('Servicio',h.tipo,M);par('Técnico',h.tec,330);y+=50;
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(94,113,144);doc.text('TRABAJO REALIZADO',M,y);y+=10;
+    var l=doc.splitTextToSize(h.desc,R-M-24);doc.setFillColor(244,247,251);doc.roundedRect(M,y,R-M,28+l.length*15,8,8,'F');
+    doc.setFont('helvetica','normal');doc.setFontSize(12);doc.setTextColor(1,30,65);doc.text(l,M+12,y+22);y+=48+l.length*15;
+    if(h.foto){try{var ip=doc.getImageProperties(h.foto),fw=220,fh=fw*ip.height/ip.width;if(fh>200){fh=200;fw=fh*ip.width/ip.height;}doc.addImage(h.foto,'JPEG',M,y,fw,fh);y+=fh+20;}catch(e){}}
+    doc.setDrawColor(200,210,225);doc.line(M,y+50,M+220,y+50);
+    if(h.firma){try{doc.addImage(h.firma,'JPEG',M,y,150,45);}catch(e){}}else{doc.setFont('helvetica','italic');doc.setFontSize(16);doc.setTextColor(30,60,120);doc.text('Juan del Pueblo',M+6,y+40);}
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(94,113,144);doc.text('Firma del cliente',M,y+64);
+    doc.setFontSize(8);doc.text('DEMO · Datos de ejemplo · Reporte generado con Historial QR de Automatiza PR · automatizacrm.com',W/2,760,{align:'center'});
+    var url=URL.createObjectURL(doc.output('blob'));if(w)w.location=url;else location.href=url;
+  }catch(e){if(w)w.close();toast('No se pudo abrir el PDF.');}
 }
-function crearPdf(h){
-  const c = cli(h.cliente); const { jsPDF } = window.jspdf; const doc = new jsPDF({unit:'pt',format:'letter',compress:true});
-  const M=36, W=612, R=W-M; const F=(st,sz)=>{doc.setFont('helvetica',st);doc.setFontSize(sz);}; const T=(s,x,y,o)=>doc.text(String(s==null?'':s),x,y,o||{});
-  doc.setFillColor(15,118,110); doc.rect(0,0,W,86,'F');
-  doc.setFillColor(255,255,255); doc.roundedRect(M,18,50,50,10,10,'F'); doc.setFillColor(15,118,110); doc.triangle(M+25,26,M+11,33,M+39,33,'F'); doc.rect(M+11,33,28,14,'F'); doc.triangle(M+11,47,M+39,47,M+25,62,'F');
-  doc.setTextColor(255,255,255); F('bold',17); T(EMP.nombre, M+64, 40); F('normal',9.5); T(EMP.lic+'  ·  '+EMP.tel+'  ·  '+EMP.email, M+64, 56);
-  F('bold',11); T('REPORTE DE SERVICIO', R, 34, {align:'right'}); F('bold',18); T('#'+h.num, R, 56, {align:'right'});
-  doc.setTextColor(15,23,42); let y=112;
-  const par=(k,v,x,w)=>{ F('bold',8.5); doc.setTextColor(100,116,139); T(k.toUpperCase(),x,y); doc.setTextColor(15,23,42); F('normal',10.5); const l=doc.splitTextToSize(String(v||'—'),w); T(l.slice(0,3),x,y+13); return l.length; };
-  const half=(R-M)/2;
-  par('Cliente',c.n,M,half-10); par('Fecha y hora',larga(h.fecha)+'  '+h.hora,M+half,half); y+=34;
-  par('Dirección',c.dir,M,half-10); par('Técnico',h.tecnico,M+half,half); y+=34;
-  par('Tipo de servicio',h.tipo.join(', '),M,half-10); par('Áreas tratadas',h.areas.join(', '),M+half,half); y+=40;
-  F('bold',11); T('Actividad de plagas',M,y); y+=8;
-  const cw=(R-M)/5; PLAGAS.forEach((p,i)=>{ const n=h.plagas[p[0]]; const col=[[220,252,231],[224,242,254],[254,243,199],[254,226,226]][n];
-    doc.setFillColor(...col); doc.roundedRect(M+i*cw+2,y,cw-4,40,6,6,'F'); F('bold',9.5); T(p[1],M+i*cw+cw/2,y+16,{align:'center'}); F('normal',10); T(NIV[n],M+i*cw+cw/2,y+31,{align:'center'}); });
-  y+=58;
-  F('bold',11); T('Productos aplicados',M,y); y+=6; doc.setDrawColor(226,232,240);
-  h.prods.forEach(p=>{ y+=16; F('normal',10); T('• '+p[0],M+4,y); T(p[1]||'',R,y,{align:'right'}); }); y+=10; doc.line(M,y,R,y); y+=16;
-  F('normal',10); T('Estaciones de roedores revisadas: '+h.est[0]+'   ·   Con consumo: '+h.est[1], M, y); y+=22;
-  F('bold',11); T('Recomendaciones al cliente',M,y); F('normal',10); (h.recs.length?h.recs:['—']).forEach(r=>{ y+=15; T('✓  '.replace('✓','-')+r, M+4, y); }); y+=22;
-  F('bold',11); T('Observaciones',M,y); F('normal',10); const ol=doc.splitTextToSize(h.obs||'—',R-M); T(ol.slice(0,4),M,y+15); y+=18+Math.min(4,ol.length)*12;
-  doc.setFillColor(240,253,250); doc.roundedRect(M,y,R-M,30,6,6,'F'); F('bold',11); doc.setTextColor(17,94,89); T('Próximo servicio: '+larga(h.proximo), M+12, y+19); doc.setTextColor(15,23,42); y+=50;
-  const fw=(R-M)/2-20;
-  [0,1].forEach(n=>{ const x=M+n*((R-M)/2+20); const im=h.firmas && h.firmas[n];
-    if (im) { try { doc.addImage(im,'JPEG',x,y,fw*0.6,fw*0.6*0.3); } catch(e){} }
-    else if (h.firmado) { F('italic',16); doc.setTextColor(30,58,138); T(n?h.tecnico:c.c, x+8, y+30); doc.setTextColor(15,23,42); }
-    doc.line(x,y+44,x+fw,y+44); F('normal',9); T(n?'Firma del técnico licenciado':'Firma del cliente ('+c.c+')', x, y+57); });
-  y+=78;
-  const fotos=[h.fotos&&h.fotos.antes,h.fotos&&h.fotos.despues].filter(Boolean);
-  if (fotos.length) { if (y>560) { doc.addPage(); y=M; } F('bold',11); T('Fotos del servicio',M,y); y+=8; const pw=(R-M-12)/2;
-    fotos.forEach((f,i)=>{ try { const ip=doc.getImageProperties(f); const ph=Math.min(170, pw*ip.height/ip.width); doc.addImage(f,'JPEG',M+i*(pw+12),y,pw*Math.min(1,170/(pw*ip.height/ip.width)),ph); F('normal',9); T(i?'Después':'Antes',M+i*(pw+12),y+ph+12); } catch(e){} }); }
-  const pages = doc.getNumberOfPages();
-  for (let p=1;p<=pages;p++){ doc.setPage(p); F('normal',7.5); doc.setTextColor(120,120,120);
-    T('DEMOSTRACIÓN · Datos ficticios · Reporte digital generado por el sistema Historial QR de Automatiza PR'+(h.gps?' · GPS '+h.gps.lat.toFixed(5)+', '+h.gps.lng.toFixed(5):''), W/2, 772, {align:'center'}); }
-  return doc;
-}
-
-// ---------- Stickers ----------
-function pintarStk(){
-  const base = location.href.split('#')[0];
-  $('stk').innerHTML = CLI.map(c=>'<div class="sticker"><div class="h">CONTROL DE PLAGAS</div><div class="qr" id="q_'+c.id+'"></div><b>'+esc(c.n)+'</b><span>'+c.id+' · Escanee para ver el historial</span><div style="margin-top:6px;font-size:11px;color:#0f766e;font-weight:700">'+EMP.nombre+' · '+EMP.tel+'</div></div>').join('');
-  CLI.forEach(c => { try { new QRCode($('q_'+c.id), { text: base + '#/qr/' + c.id, width:150, height:150, correctLevel: QRCode.CorrectLevel.M }); } catch(e){ $('q_'+c.id).textContent='QR'; } });
-}
-route();
+try{new QRCode($('qr'),{text:location.href.split('#')[0],width:208,height:208,colorDark:'#011E41',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}catch(e){}
+pintar();
 </script>
 </body>
 </html>
