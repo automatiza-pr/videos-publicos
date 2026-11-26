@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automatiza PR · Tarjeta digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Poppins,system-ui,sans-serif;background:#E9EEF5;color:#011E41;-webkit-font-smoothing:antialiased}
+.card{max-width:480px;margin:0 auto;background:#fff;min-height:100vh;box-shadow:0 0 40px rgba(1,30,65,.12)}
+.hero{position:relative;background:radial-gradient(circle at 85% 0%,#0A4FC9 0,rgba(0,103,253,0) 55%),linear-gradient(160deg,#011E41 0%,#022A5C 100%);color:#fff;padding:34px 26px 92px;text-align:center;overflow:hidden}
+.hero:after{content:"";position:absolute;left:-10%;right:-10%;bottom:-60px;height:120px;background:#fff;border-radius:50%}
+.hero img{height:64px;display:block;margin:0 auto 14px}
+.brand{font-size:28px;font-weight:800;letter-spacing:-.5px}.brand b{color:#3D8BFF}
+.tag{font-size:14px;color:#BFD3F2;margin-top:4px}
+.chips{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.chips span{font-size:12px;font-weight:600;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:5px 11px;border-radius:20px}
+.who{position:relative;z-index:2;margin:-62px 20px 0;background:#fff;border-radius:22px;box-shadow:0 12px 34px rgba(1,30,65,.14);padding:20px 20px 18px;text-align:center}
+.who h1{font-size:24px;font-weight:800}
+.who p{font-size:14px;color:#4A6280}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.quick a{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:#011E41;font-size:12px;font-weight:600}
+.quick i{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#EAF2FF}
+.quick a:nth-child(2) i{background:#E8F8DC}
+.quick svg{width:26px;height:26px}
+.save{display:flex;gap:10px;margin:16px 20px 0}
+.btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:14px;padding:15px;font:700 15px Poppins,sans-serif;cursor:pointer;text-decoration:none}
+.btn.p{background:#0067FD;color:#fff;box-shadow:0 8px 20px rgba(0,103,253,.3)}
+.btn.s{background:#EEF2F7;color:#011E41;flex:.55}
+.btn svg{width:20px;height:20px}
+section{padding:26px 20px 0}
+h2{font-size:13px;font-weight:800;letter-spacing:2px;color:#0067FD;margin-bottom:12px}
+.svc{display:grid;gap:10px}
+.svc div{display:flex;gap:14px;align-items:center;background:#F6F8FB;border-radius:16px;padding:14px}
+.svc b{flex:none;width:44px;height:44px;border-radius:12px;background:#011E41;color:#8AD528;display:flex;align-items:center;justify-content:center;font-size:20px}
+.svc strong{display:block;font-size:15px}
+.svc span{font-size:13px;color:#4A6280;line-height:1.35}
+.links{display:grid;gap:10px}
+.links a{display:flex;align-items:center;gap:12px;text-decoration:none;color:#011E41;background:#F6F8FB;border-radius:14px;padding:14px 16px;font-size:14px;font-weight:600}
+.links a span{margin-left:auto;color:#8FA3BF;font-size:18px}
+.links svg{width:22px;height:22px;flex:none}
+.form{border-radius:18px;overflow:hidden;background:#F6F8FB}
+.form iframe{width:100%;height:560px;border:none;display:block}
+.qr{display:flex;gap:16px;align-items:center;background:#011E41;color:#fff;border-radius:18px;padding:16px}
+#qr{background:#fff;padding:8px;border-radius:12px;flex:none}
+#qr img,#qr canvas{width:110px!important;height:110px!important;display:block}
+.qr p{font-size:14px;color:#BFD3F2;line-height:1.4}.qr strong{color:#fff;display:block;font-size:16px;margin-bottom:4px}
+footer{text-align:center;font-size:12px;color:#8FA3BF;padding:26px 20px 34px}
+footer a{color:#0067FD;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="hero">
+    <img src="https://raw.githubusercontent.com/automatiza-pr/videos-publicos/main/tarjeta/isotipo.png" alt="Automatiza PR">
+    <div class="brand">Automatiza <b>PR</b></div>
+    <div class="tag">Conectamos tu marketing con tus ventas.</div>
+    <div class="chips"><span>CRM</span><span>Manejo de redes</span><span>Automatización</span><span>Inteligencia Artificial</span></div>
+  </div>
+
+  <div class="who">
+    <h1>Hablemos de tu negocio</h1>
+    <p>Manejo de redes, CRM, automatización e IA para negocios en Puerto Rico</p>
+    <div class="quick">
+      <a href="tel:+17879080993"><i><svg viewBox="0 0 24 24" fill="none" stroke="#0067FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></i>Llamar</a>
+      <a href="https://wa.me/17879080993?text=Hola%2C%20vi%20su%20tarjeta%20digital%20y%20quiero%20informaci%C3%B3n."><i><svg viewBox="0 0 24 24" fill="none" stroke="#3E9B1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.6A8.4 8.4 0 1 1 21 11.5z"/><path d="M8.5 9.5c.5 2 2 3.5 4 4.5l1.2-1.2 2 .8-.4 1.6c-3.6.4-7.4-3.4-7-7l1.6-.4.8 2z"/></svg></i>WhatsApp</a>
+      <a href="sms:+17879080993"><i><svg viewBox="0 0 24 24" fill="none" stroke="#0067FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></i>Texto</a>
+      <a href="mailto:contacto@automatiza-pr.com"><i><svg viewBox="0 0 24 24" fill="none" stroke="#0067FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg></i>Email</a>
+    </div>
+  </div>
+
+  <div class="save">
+    <button class="btn p" onclick="guardar()"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Guardar contacto</button>
+    <button class="btn s" onclick="compartir()"><svg viewBox="0 0 24 24" fill="none" stroke="#011E41" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Compartir</button>
+  </div>
+
+  <section>
+    <h2>SERVICIOS</h2>
+    <div class="svc">
+      <div><b>⚙</b><p><strong>Automatiza CRM</strong><span>WhatsApp, Facebook e Instagram en un solo lugar, seguimiento, citas y cobros.</span></p></div>
+      <div><b>✦</b><p><strong>Automatizaciones e IA</strong><span>Respuestas automáticas, asistentes con IA y procesos que trabajan solos.</span></p></div>
+      <div><b>▶</b><p><strong>Manejo de redes</strong><span>Artes, reels con IA y campañas en Facebook e Instagram.</span></p></div>
+      <div><b>▣</b><p><strong>Historial QR</strong><span>Reportes digitales de servicio con un QR por equipo.</span></p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>ENLACES</h2>
+    <div class="links">
+      <a href="https://automatizacrm.com" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="#0067FD" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>automatizacrm.com<span>›</span></a>
+      <a href="https://www.facebook.com/1015114541678571" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="#0067FD" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M15 8h-2a2 2 0 0 0-2 2v11M9 13h6"/></svg>Facebook · Automatiza PR<span>›</span></a>
+      <a href="https://www.youtube.com/@AutomatizaPR" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="#0067FD" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3z"/></svg>YouTube · @AutomatizaPR<span>›</span></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>¿TE AYUDO CON TU NEGOCIO?</h2>
+    <div class="form">
+      <iframe src="https://api.leadconnectorhq.com/widget/form/DTIQSXmQkZGpg2qa4XsN" id="inline-DTIQSXmQkZGpg2qa4XsN" data-layout="{'id':'INLINE'}" data-trigger-type="alwaysShow" data-activation-type="alwaysActivated" data-deactivation-type="neverDeactivate" data-form-name="Solicitud de Informacion- Automatiza CRM" data-height="560" data-layout-iframe-id="inline-DTIQSXmQkZGpg2qa4XsN" data-form-id="DTIQSXmQkZGpg2qa4XsN" title="Solicitud de Informacion- Automatiza CRM"></iframe>
+    </div>
+  </section>
+
+  <section>
+    <div class="qr"><div id="qr"></div><p><strong>Comparte esta tarjeta</strong>Que la escaneen desde tu celular y les queda todo: teléfono, WhatsApp y servicios.</p></div>
+  </section>
+
+  <footer>Tarjeta digital hecha con <a href="https://automatizacrm.com" target="_blank">Automatiza CRM</a></footer>
+</div>
+
+<script src="https://link.msgsndr.com/js/form_embed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+function guardar(){
+  var v=["BEGIN:VCARD","VERSION:3.0","N:;Automatiza PR;;;","FN:Automatiza PR","ORG:Automatiza PR",
+  "TEL;TYPE=CELL,VOICE:+17879080993","TEL;TYPE=WORK,VOICE:+19392545301","EMAIL;TYPE=WORK:contacto@automatiza-pr.com",
+  "URL:https://automatizacrm.com",
+  "NOTE:Manejo de redes, CRM, automatización e inteligencia artificial para negocios en Puerto Rico.","END:VCARD"].join("\r\n");
+  var b=new Blob([v],{type:"text/vcard;charset=utf-8"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download="Automatiza-PR.vcf";document.body.appendChild(a);a.click();a.remove();
+}
+function compartir(){
+  var d={title:"Automatiza PR",text:"Tarjeta digital de Automatiza PR",url:location.href};
+  if(navigator.share){navigator.share(d).catch(function(){});}
+  else{try{navigator.clipboard.writeText(location.href);alert("Enlace copiado");}catch(e){}}
+}
+try{new QRCode(document.getElementById("qr"),{text:location.href,width:220,height:220,colorDark:"#011E41",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});}catch(e){}
+</script>
+</body>
+</html>
