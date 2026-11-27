@@ -226,6 +226,14 @@
 <script>
 const D = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('__data').textContent))));
 const T = D.trampa, LOGO = __LOGO, BASE = D.base;
+// Memoria que funciona aunque la página esté en modo protegido (sandbox) de n8n: usa localStorage si se puede; si no, window.name (se queda en la pestaña al cambiar de página).
+const ST = (() => { let ok = false; try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); ok = true; } catch(e){}
+  const rd = () => { try { const o = JSON.parse(window.name || '{}'); return (o && o.tw) ? o : {tw:1}; } catch(e){ return {tw:1}; } };
+  const wr = o => { try { window.name = JSON.stringify(o); } catch(e){} };
+  return { real: ok,
+    getItem(k){ if (ok) { try { return localStorage.getItem(k); } catch(e){} } const v = rd()[k]; return v == null ? null : v; },
+    setItem(k,v){ if (ok) { try { return localStorage.setItem(k, v); } catch(e){} } const o = rd(); o[k] = String(v); wr(o); },
+    removeItem(k){ if (ok) { try { return localStorage.removeItem(k); } catch(e){} } const o = rd(); delete o[k]; wr(o); } }; })();
 let PIN = '';
 document.getElementById('hlogo').src = LOGO;
 document.getElementById('hsub').textContent = T.codigo + ' · ' + T.cliente;
@@ -251,13 +259,13 @@ async function checkPin(){
 document.getElementById('pin').addEventListener('keydown', e => { if (e.key==='Enter') checkPin(); });
 // Si viene de la app de choferes: entra solo con el PIN y muestra botón para volver
 (function(){ try {
-  if (sessionStorage.getItem('tw_app') !== '1') return;
+  if (ST.getItem('tw_app') !== '1') return;
   const h = document.querySelector('header.app'); const btn = document.createElement('a');
   btn.textContent = '← App'; btn.href = BASE + 'truewaste/app';
   btn.style.cssText = 'margin-left:auto;font-size:15px;padding:8px 14px;border:1px solid #d7dde8;border-radius:8px;background:#fff;color:#1b2a4a;text-decoration:none;font-weight:700';
   h.appendChild(btn);
   const d = document.getElementById('doneArea'); if (d) { const v = btn.cloneNode(true); v.textContent = 'Volver a la app'; v.style.cssText = ''; d.querySelector('.ok').appendChild(v); }
-  const sp = sessionStorage.getItem('tw_pin'); if (sp) { document.getElementById('pin').value = sp; checkPin(); }
+  const sp = ST.getItem('tw_pin'); if (sp) { document.getElementById('pin').value = sp; checkPin(); }
 } catch(e){} })();
 
 // ----- Formulario -----
@@ -267,7 +275,7 @@ function initForm(){
   const now = new Date();
   document.getElementById('fecha').value = now.toLocaleDateString('en-CA');
   document.getElementById('hora').value = now.toTimeString().slice(0,5);
-  try { document.getElementById('tecnico').value = localStorage.getItem('tw_tecnico') || ''; } catch(e){}
+  try { document.getElementById('tecnico').value = ST.getItem('tw_tecnico') || ''; } catch(e){}
   // inspección
   let h = '<tr><th></th>' + COLS.map(c=>'<th>'+c+'</th>').join('') + '</tr>';
   ROWS.forEach((r,i) => { h += '<tr><td class="rl">'+r+'</td>' + COLS.map((c,j)=>'<td class="c" data-k="'+i+'_'+j+'"></td>').join('') + '</tr>'; });
@@ -533,7 +541,7 @@ async function guardar(){
   const err = document.getElementById('formErr'); err.textContent='';
   if (!v('tecnico')) { err.textContent = 'Falta el nombre del técnico (Realizado por).'; return; }
   if (!S.pago) { err.textContent = 'Escoge la forma de pago.'; return; }
-  try { localStorage.setItem('tw_tecnico', v('tecnico')); } catch(e){}
+  try { ST.setItem('tw_tecnico', v('tecnico')); } catch(e){}
   ov(true, 'Reservando número de conduce…');
   try {
     const r1 = await fetch(BASE+'truewaste/api/start', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({k:T.token, pin:PIN})});
