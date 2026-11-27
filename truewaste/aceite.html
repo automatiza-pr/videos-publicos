@@ -246,8 +246,8 @@ function abrirCliente(cod){
   ['galones','costo','pagado','balance','notas'].forEach(i => $(i).value = '');
   const now = new Date(); $('fecha').value = now.toLocaleDateString('en-CA'); $('hora').value = now.toTimeString().slice(0,5);
   try { ['chofer','licencia','tablilla'].forEach(i => $(i).value = localStorage.getItem('tw_'+i) || ''); } catch(e){}
-  S = { personal:'', foto:null }; SVC_GPS = null; POS = null;
-  document.querySelectorAll('#personal .chk').forEach(el => { el.classList.remove('on'); el.onclick = () => { document.querySelectorAll('#personal .chk').forEach(x=>x.classList.remove('on')); el.classList.add('on'); S.personal = el.dataset.v; }; });
+  S = { personal:'', foto:null }; SVC_GPS = null; POS = null; verFalta();
+  document.querySelectorAll('#personal .chk').forEach(el => { el.classList.remove('on'); el.onclick = () => { document.querySelectorAll('#personal .chk').forEach(x=>x.classList.remove('on')); el.classList.add('on'); S.personal = el.dataset.v; verFalta(); }; });
   $('fotoBox').innerHTML = '<span>📷 Tocar para tomar foto</span><input type="file" accept="image/*" capture="environment" id="fotoIn">';
   $('fotoIn').onchange = e => cargarFoto(e.target);
   $('formErr').textContent = ''; $('gpsTxt').textContent = '—'; $('gpsNota').textContent = '';
@@ -375,7 +375,9 @@ function prepContacto(){
   $('faltaP').textContent = falta.length ? 'Pregúntale al encargado y anótalo aquí. Se guarda solo en la lista de clientes.' : 'Si algo cambió, corrígelo aquí.';
   document.querySelectorAll('#kAcepta .chk').forEach(el => { el.classList.toggle('on', el.dataset.v === K.acepta); el.onclick = () => { document.querySelectorAll('#kAcepta .chk').forEach(x=>x.classList.remove('on')); el.classList.add('on'); K.acepta = el.dataset.v; }; });
 }
+function verFalta(){ $('faltaBox').classList.toggle('hidden', !S.personal.startsWith('Sí')); }
 function contactoNuevo(){
+  if (!S.personal.startsWith('Sí')) return null;
   const nom = v('kNombre'), cel = v('kCel');
   const ch = {};
   if (nom && nom !== (C.contacto||'')) ch.contacto = nom;
