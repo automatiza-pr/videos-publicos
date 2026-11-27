@@ -1,2 +1,7 @@
-# nombre url
-prueba_voz.mp3 https://storage.googleapis.com/eleven-public-prod/database/workspace/e722a4a0c8a94dac8caa19d4ce9e29e1/voices/6yJbRCDgjQDmHJ6NrRYG/x38wTNl9fPIKdomQoriP.mp3
+voz_ia.mp3 https://elevenlabsusercontent.com/database/workspace/35643dfeb75e4eb38d6eb7cafd5d29fa/content_generation/GMMeexFjBVFFE3JWg0Bt/QMHOXOr3JtWrjTiQw0q7/content.mp3?Expires=1795762800&KeyName=assets-cdn-key-1&Signature=ZBgLEjqAHFOcx4ZIjj_e0Cxh-3c=
+voz_ia_b.mp3 https://elevenlabsusercontent.com/database/workspace/35643dfeb75e4eb38d6eb7cafd5d29fa/content_generation/5uik586O05l7v9G7QWGx/X3uRsUuv1S7Q43SiPUxl/content.mp3?Expires=1795762800&KeyName=assets-cdn-key-1&Signature=YhS5QkNaABXdCgVtcce0EvlYXwE=
+voz_dolor.mp3 https://elevenlabsusercontent.com/database/workspace/35643dfeb75e4eb38d6eb7cafd5d29fa/content_generation/Ggqajtswzkmu63nYxUKK/CMCtiR945hcE2ezxe0vI/content.mp3?Expires=1795762800&KeyName=assets-cdn-key-1&Signature=ROOYwEnwj5ZHTjWZOSufx4d_lI8=
+voz_bandeja.mp3 https://elevenlabsusercontent.com/database/workspace/35643dfeb75e4eb38d6eb7cafd5d29fa/content_generation/rfnYYHTzCMYilVzU3SLI/5cue9uRqUh5GGt6DxWts/content.mp3?Expires=1795762800&KeyName=assets-cdn-key-1&Signature=LMzpKCgqqLf9bH-q3CHEnnEhP0U=
+voz_cita.mp3 https://elevenlabsusercontent.com/database/workspace/35643dfeb75e4eb38d6eb7cafd5d29fa/content_generation/IaNAKP6PKyPPgRtmKYgj/g77vsMePI8ADDqUCqrZI/content.mp3?Expires=1795762800&KeyName=assets-cdn-key-1&Signature=wk3I3s4s-mSrpWNDVMm6fcnQUd8=
+voz_beneficio.mp3 https://elevenlabsusercontent.com/database/workspace/35643dfeb75e4eb38d6eb7cafd5d29fa/content_generation/PzlpHmWqW0Pni2A4BVPe/UBWG2OoP3HbsdDFHdT6q/content.mp3?Expires=1795762800&KeyName=assets-cdn-key-1&Signature=vqyydE9GUwj974BtV5K6gfTrcIc=
+voz_cta.mp3 https://elevenlabsusercontent.com/database/workspace/35643dfeb75e4eb38d6eb7cafd5d29fa/content_generation/X04uCbeuchxVFo7Puvu2/zT4vMWUk1qhMwVKQph9f/content.mp3?Expires=1795762800&KeyName=assets-cdn-key-1&Signature=PU8p5M5XiXZrwtGi9savuT8mk7w=
