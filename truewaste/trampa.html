@@ -30,7 +30,7 @@
 </style>
 </head>
 <body>
-<div class="top"><img id="logo" alt="True Waste Oil Recycling"><div class="co">Recogido de Aceite Vegetal · Limpieza de Trampa de Grasa<br>787-291-7287 · Isabela, PR</div></div>
+<div class="top"><img id="logo" alt="True Waste Oil Recycling"><div class="co">Recogido de Aceite Vegetal Usado · Limpieza de Trampa de Grasa<br>787-291-7287 · Isabela, PR</div></div>
 <main>
   <div class="card">
     <div class="lbl">Establecimiento</div><div class="val" id="cliente"></div>
@@ -58,9 +58,9 @@ const ok = R.filter(r => r.pdf_url);
 const u = document.getElementById('ultimo');
 if (ok.length) {
   const r = ok[0]; u.classList.add('last');
-  u.innerHTML = '<h2>Último servicio</h2><div class="rep"><div class="d"><b>'+fd(r.fecha)+'</b><div>Factura/Conduce '+esc(r.numero)+' · Técnico: '+esc(r.tecnico)+'</div><div>'+esc(r.resumen||'')+'</div></div><a href="'+esc(r.pdf_url)+'" target="_blank">Ver PDF</a></div>';
+  u.innerHTML = '<h2>Último servicio</h2><div class="rep"><div class="d"><b>'+fd(r.fecha)+'</b><div>Factura de Servicio '+esc(r.numero)+' · Técnico: '+esc(r.tecnico)+'</div><div>'+esc(r.resumen||'')+'</div></div><a href="'+esc(r.pdf_url)+'" target="_blank">Ver PDF</a></div>';
 } else u.innerHTML = '<div class="empty">Todavía no hay reportes de servicio para esta trampa.</div>';
-document.getElementById('lista').innerHTML = ok.length ? ok.map(r => '<div class="rep"><div class="d"><b>'+fd(r.fecha)+'</b><div>Factura/Conduce '+esc(r.numero)+' · '+esc(r.tecnico)+'</div></div><a href="'+esc(r.pdf_url)+'" target="_blank">Ver PDF</a></div>').join('') : '<div class="empty">Sin reportes.</div>';
+document.getElementById('lista').innerHTML = ok.length ? ok.map(r => '<div class="rep"><div class="d"><b>'+fd(r.fecha)+'</b><div>Factura de Servicio '+esc(r.numero)+' · '+esc(r.tecnico)+'</div></div><a href="'+esc(r.pdf_url)+'" target="_blank">Ver PDF</a></div>').join('') : '<div class="empty">Sin reportes.</div>';
 </script>
 </body>
 </html>

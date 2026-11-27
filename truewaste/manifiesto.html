@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Manifiesto de Servicio – True Waste</title>
+<title>Factura de Servicio – True Waste</title>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
   :root { --navy:#1b2a4a; --blue:#1aa3e8; --gray:#5b6577; --line:#d7dde8; --bg:#f3f6fa; --green:#16a34a; --red:#dc2626; }
@@ -113,7 +113,7 @@
 <header class="app">
   <img id="hlogo" alt="True Waste">
   <div>
-    <h1>Manifiesto de Servicio</h1>
+    <h1>Factura de Servicio</h1>
     <div class="sub" id="hsub"></div>
   </div>
 </header>
@@ -392,9 +392,9 @@ function buildDoc(numero){
   const sig = sigDrawn ? '<img src="'+document.getElementById('firma').toDataURL('image/png')+'">' : '';
   const [yy,mm,dd] = (v('fecha')||'').split('-'); const fechaTxt = dd ? dd+'/'+mm+'/'+yy : '';
   let html = '<div class="pg">'
-   + '<div class="hd"><div><img src="'+LOGO+'"><div class="serv"><b>Servicios:</b><br>Recogido de Aceite Vegetal<br>Limpieza trampa de Grasa</div></div>'
+   + '<div class="hd"><div><img src="'+LOGO+'"><div class="serv"><b>Servicios:</b><br>Recogido de Aceite Vegetal Usado<br>Limpieza trampa de Grasa</div></div>'
    + '<div class="mid">3623 Ave. Militar PMB 112 Isabela, PR 00662<br><span class="b">Tels. 787-291-7287 • 787-380-1062 ISABELA</span><br><span class="b">787-380-4888 BAYAMÓN</span><hr>truewasteoilrecycling@gmail.com<br>www.truewasteoilrecycling.com<br>www.truewasteoil.com</div>'
-   + '<div><div class="fc"><div class="t">Factura/Conduce</div><div class="n">'+numero+'</div></div></div></div>'
+   + '<div><div class="fc"><div class="t">Factura de Servicio</div><div class="n">'+numero+'</div></div></div></div>'
    + '<div class="box"><h3>REPORTES DE SERVICIO</h3>'
    + '<div class="row"><span class="k">Nombre:</span><span class="v">'+esc(v('nombre'))+'</span></div>'
    + '<div class="row"><span class="k">Dirección:</span><span class="v">'+esc(v('direccion'))+'</span></div>'
@@ -421,7 +421,7 @@ function buildDoc(numero){
    + '<div><div class="cheque">Todo cheque devuelto tiene un cargo de $25.00</div><div class="pagada">Esta factura debe ser pagada en su totalidad al momento del servicio</div></div></div>'
    + '<div class="meta">Reporte digital · '+esc(T.codigo)+' · generado '+new Date().toLocaleString('es-PR')+'</div></div>';
   const fotos = S.fotos.map((f,i)=>f?'<div><img src="'+f+'"><br>Foto '+(i+1)+' – '+(i<2?'Antes':'Después')+'</div>':'').join('');
-  if (fotos) html += '<div class="pg" style="page-break-before:always"><h3>FOTOS DEL SERVICIO – Factura/Conduce '+numero+'</h3><div class="ph">'+fotos+'</div></div>';
+  if (fotos) html += '<div class="pg" style="page-break-before:always"><h3>FOTOS DEL SERVICIO – Factura de Servicio '+numero+'</h3><div class="ph">'+fotos+'</div></div>';
   document.getElementById('doc').innerHTML = html;
 }
 function buildPdf(numero){
@@ -438,7 +438,7 @@ function buildPdf(numero){
   const title = (s, x, y, sz) => { F('bold', sz||10.5); txt(s, x, y); };
   // ---------- Encabezado ----------
   try { doc.addImage(__LOGO, 'JPEG', M+6, M-4, 66, 66); } catch(e){}
-  F('bold',9); txt('Servicios:', M, M+74); F('normal',8.5); txt('Recogido de Aceite Vegetal', M, M+84); txt('Limpieza trampa de Grasa', M, M+94);
+  F('bold',9); txt('Servicios:', M, M+74); F('normal',8.5); txt('Recogido de Aceite Vegetal Usado', M, M+84); txt('Limpieza trampa de Grasa', M, M+94);
   const cx = 292;
   F('normal',9); txt('3623 Ave. Militar PMB 112 Isabela, PR 00662', cx, M+10, {align:'center'});
   F('bold',10); txt('Tels. 787-291-7287 · 787-380-1062 ISABELA', cx, M+24, {align:'center'}); txt('787-380-4888 BAYAMÓN', cx, M+37, {align:'center'});
@@ -446,7 +446,7 @@ function buildPdf(numero){
   F('normal',9); txt('truewasteoilrecycling@gmail.com', cx, M+55, {align:'center'}); txt('www.truewasteoilrecycling.com', cx, M+67, {align:'center'}); txt('www.truewasteoil.com', cx, M+79, {align:'center'});
   const bx = R-150, by = M+28;
   doc.setFillColor(58,58,58); doc.rect(bx, by, 150, 20, 'F'); doc.setLineWidth(1.4); doc.rect(bx, by, 150, 50); doc.setLineWidth(0.6);
-  doc.setTextColor(255,255,255); F('bold',11.5); txt('Factura/Conduce', bx+75, by+14, {align:'center'});
+  doc.setTextColor(255,255,255); F('bold',11.5); txt('Factura de Servicio', bx+75, by+14, {align:'center'});
   doc.setTextColor(200,0,0); F('bold',17); txt(String(numero), bx+75, by+42, {align:'center'}); doc.setTextColor(0,0,0);
   let y = M + 104;
   // ---------- Reportes de servicio ----------
@@ -508,7 +508,7 @@ function buildPdf(numero){
   // ---------- Fotos ----------
   const fotos = S.fotos.map((f,i)=>f?{f,i}:null).filter(Boolean);
   if (fotos.length) {
-    doc.addPage(); F('bold',12); txt('FOTOS DEL SERVICIO – Factura/Conduce ' + numero, M, M+12); F('normal',9); txt(T.cliente + ' · ' + T.codigo, M, M+26);
+    doc.addPage(); F('bold',12); txt('FOTOS DEL SERVICIO – Factura de Servicio ' + numero, M, M+12); F('normal',9); txt(T.cliente + ' · ' + T.codigo, M, M+26);
     const pw = (R-M-14)/2, ph = 300;
     fotos.forEach((p,k) => { const xx = M + (k%2)*(pw+14), yy = M+40 + Math.floor(k/2)*(ph+30);
       try { const ip = doc.getImageProperties(p.f); const sc = Math.min(pw/ip.width, ph/ip.height); const iw2 = ip.width*sc, ih2 = ip.height*sc;
@@ -541,7 +541,7 @@ async function guardar(){
     const j2 = await r2.json(); if (!j2.ok) throw new Error(j2.error||'No se pudo guardar');
     ov(false);
     document.getElementById('formArea').classList.add('hidden'); document.getElementById('doneArea').classList.remove('hidden');
-    document.getElementById('doneMsg').textContent = 'Factura/Conduce ' + numero + ' · ' + T.cliente;
+    document.getElementById('doneMsg').textContent = 'Factura de Servicio ' + numero + ' · ' + T.cliente;
     document.getElementById('donePdf').href = j2.pdf_url;
     document.getElementById('doneQr').href = BASE + 'truewaste/t?k=' + T.token;
     window.scrollTo(0,0);
