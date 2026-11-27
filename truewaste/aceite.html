@@ -208,7 +208,6 @@ const $ = i => document.getElementById(i);
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function norm(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
 $('hlogo').src = __LOGO;
-TODOS.forEach(c => { const u = UBI[c.codigo]; if (u) { c.lat = u.lat; c.lng = u.lng; } });
 
 // ----- PIN -----
 async function checkPin(){
@@ -216,7 +215,15 @@ async function checkPin(){
   try {
     const r = await fetch(BASE + 'truewaste/api/pin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pin:p})});
     const j = await r.json();
-    if (j.ok) { PIN = p; ZONA = j.zona || 'Bayamón'; CLIENTES = TODOS.filter(c => (c.zona || 'Bayamón') === ZONA); try { ST.setItem('tw_pin', p); } catch(e){} $('pinScreen').classList.add('hidden'); iniciar(); return; }
+    if (j.ok) {
+      // La lista de clientes solo se baja después de validar el PIN (ya no viene dentro de la página)
+      ov(true, 'Cargando clientes…');
+      let d = null;
+      try { const r2 = await fetch(BASE + 'truewaste/api/app/datos', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pin:p})}); d = await r2.json(); } catch(e){}
+      ov(false);
+      if (!d || !d.ok) { $('pinErr').textContent = 'No se pudo cargar la lista de clientes. Revisa la señal e intenta de nuevo.'; return; }
+      PIN = p; ZONA = d.zona || j.zona || 'Bayamón'; CLIENTES = d.clientes || [];
+      try { ST.setItem('tw_pin', p); } catch(e){} $('pinScreen').classList.add('hidden'); iniciar(); return; }
   } catch(e){}
   $('pinErr').textContent = 'PIN incorrecto';
 }
