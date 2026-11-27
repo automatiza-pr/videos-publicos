@@ -296,7 +296,7 @@ function pintarHoy(){
   $('resHoy').innerHTML = '<div><b>' + H.length + '</b><span>Recogidos hoy</span></div><div><b>' + (Math.round(gal*10)/10) + '</b><span>Galones</span></div>';
   $('listaHoy').innerHTML = H.length ? H.map(x => '<div class="card hoyItem"><div><b>' + esc(x.c.cliente) + '</b><small>' + esc(x.c.pueblo) + ' · ' + esc(x.h.hr||'') + (x.h.g ? ' · ' + x.h.g + ' gal' : '') + (x.h.ch ? ' · ' + esc(x.h.ch) : '') + '</small></div>' + (x.h.pdf ? '<a href="' + esc(x.h.pdf) + '" target="_blank" rel="noopener">Recibo</a>' : '') + '</div>').join('') : '<div class="vacio">Todavía no hay recogidos hoy en la zona ' + esc(D.zona) + '.</div>';
 }
-function pintarSesion(){ if (D) $('sesionTxt').textContent = 'Chofer: ' + (LS.get('tw_chofer')||'—') + ' · Zona ' + D.zona + '. Actualizado ' + new Date(D.generado||Date.now()).toLocaleTimeString('es-PR',{hour:'numeric',minute:'2-digit'}) + '.'; }
+function pintarSesion(){ if (D) $('sesionTxt').textContent = 'Chofer: ' + (LS.get('tw_chofer')||'—') + ' · Zona ' + D.zona + '. Actualizado ' + new Date(D.generado||Date.now()).toLocaleTimeString('es-PR',{hour:'numeric',minute:'2-digit'}); }
 
 // ===== Detalle =====
 function detalle(cod){
@@ -376,8 +376,8 @@ function pintarInstalar(){
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
   box.classList.remove('hidden');
   if (PROMPT) box.innerHTML = '<h3>Instala la app</h3><p>Ponla en la pantalla de tu celular para abrirla como cualquier app.</p><button class="big" onclick="PROMPT.prompt()">Instalar</button>';
-  else if (ios) box.innerHTML = '<h3>Instala la app</h3><p>En Safari toca el botón <b>Compartir</b> (cuadro con flecha) y luego <b>Agregar a pantalla de inicio</b>.</p>';
-  else box.innerHTML = '<h3>Instala la app</h3><p>En Chrome toca el menú <b>⋮</b> y luego <b>Instalar app</b> o <b>Agregar a la pantalla principal</b>.</p>';
+  else if (ios) box.innerHTML = '<h3>Pon la app en tu pantalla</h3><p>En Safari toca el botón <b>Compartir</b> (cuadro con flecha) y luego <b>Agregar a pantalla de inicio</b>.</p>';
+  else box.innerHTML = '<h3>Pon la app en tu pantalla</h3><p>En Chrome toca el menú <b>⋮</b> (arriba a la derecha) y luego <b>Agregar a la pantalla principal</b>.</p>';
 }
 try { if (ST.real && 'serviceWorker' in navigator) navigator.serviceWorker.register(BASE + 'truewaste/app/sw.js', {scope: '/webhook/truewaste/'}).catch(()=>{}); } catch(e){}
 
