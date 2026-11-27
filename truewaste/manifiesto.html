@@ -245,10 +245,20 @@ async function checkPin(){
   const p = document.getElementById('pin').value.trim();
   const r = await fetch(BASE + 'truewaste/api/pin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({k:T.token, pin:p})});
   const j = await r.json().catch(()=>({}));
-  if (j.ok) { PIN = p; document.getElementById('pinScreen').classList.add('hidden'); document.getElementById('formArea').classList.remove('hidden'); initForm(); }
+  if (j.ok && (j.zona || 'Bayamón') === 'Bayamón') { PIN = p; document.getElementById('pinScreen').classList.add('hidden'); document.getElementById('formArea').classList.remove('hidden'); initForm(); }
   else document.getElementById('pinErr').textContent = 'PIN incorrecto';
 }
 document.getElementById('pin').addEventListener('keydown', e => { if (e.key==='Enter') checkPin(); });
+// Si viene de la app de choferes: entra solo con el PIN y muestra botón para volver
+(function(){ try {
+  if (sessionStorage.getItem('tw_app') !== '1') return;
+  const h = document.querySelector('header.app'); const btn = document.createElement('a');
+  btn.textContent = '← App'; btn.href = BASE + 'truewaste/app';
+  btn.style.cssText = 'margin-left:auto;font-size:15px;padding:8px 14px;border:1px solid #d7dde8;border-radius:8px;background:#fff;color:#1b2a4a;text-decoration:none;font-weight:700';
+  h.appendChild(btn);
+  const d = document.getElementById('doneArea'); if (d) { const v = btn.cloneNode(true); v.textContent = 'Volver a la app'; v.style.cssText = ''; d.querySelector('.ok').appendChild(v); }
+  const sp = sessionStorage.getItem('tw_pin'); if (sp) { document.getElementById('pin').value = sp; checkPin(); }
+} catch(e){} })();
 
 // ----- Formulario -----
 function initForm(){

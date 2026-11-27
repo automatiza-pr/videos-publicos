@@ -181,7 +181,7 @@
   <h2>✔ Recogido guardado</h2>
   <p id="doneMsg" style="font-size:18px"></p>
   <a id="donePdf" target="_blank">Ver recibo PDF</a>
-  <button onclick="verLista()">Siguiente cliente</button>
+  <button onclick="verLista()" id="btnSig">Siguiente cliente</button>
 </div></main>
 
 <div id="overlay" class="hidden"><div class="spin"></div><div id="ovMsg">Guardando…</div></div>
@@ -224,7 +224,11 @@ function iniciar(){
   if (c) abrirCliente(c.codigo); else verLista();
 }
 // ----- Lista -----
+const DESDE_APP = (() => { try { return sessionStorage.getItem('tw_app') === '1'; } catch(e){ return false; } })();
+function volverApp(){ location.href = BASE + 'truewaste/app'; }
+if (DESDE_APP) { $('btnLista').textContent = '← Mi ruta'; $('btnLista').onclick = volverApp; $('btnSig').textContent = 'Volver a mi ruta'; }
 function verLista(){
+  if (DESDE_APP) { volverApp(); return; }
   ['formArea','doneArea'].forEach(i=>$(i).classList.add('hidden')); $('listaArea').classList.remove('hidden');
   $('btnLista').classList.add('hidden'); $('hsub').textContent = 'Zona ' + ZONA + ' · Escoge el cliente'; pintarLista(); window.scrollTo(0,0);
 }
