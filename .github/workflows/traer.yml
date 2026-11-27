@@ -1,0 +1,27 @@
+name: Traer archivos
+on:
+  push:
+    paths: ["traer/lista.txt"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  traer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar
+        run: |
+          mkdir -p traer/archivos
+          while IFS=' ' read -r nombre url; do
+            [ -z "$nombre" ] && continue
+            case "$nombre" in \#*) continue;; esac
+            curl -sSL --fail -o "traer/archivos/$nombre" "$url" && echo "ok $nombre" || echo "FALLO $nombre"
+          done < traer/lista.txt
+      - name: Guardar
+        run: |
+          git config user.name "automatiza-bot"
+          git config user.email "bot@automatiza-pr.com"
+          git add traer/archivos
+          git commit -m "Archivos traídos" || echo "nada nuevo"
+          git push
