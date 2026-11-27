@@ -191,7 +191,8 @@
 <script>
 const D = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('__data').textContent))));
 const BASE = D.base, UBI = D.ubicaciones || {};
-const CLIENTES = D.clientes || [];
+const TODOS = D.clientes || [];
+let CLIENTES = [], ZONA = '';
 const GKEY = 'AIzaSyB-cyjnluqqHry89MTUsnNeK78YC2-XO-g';
 let PIN = '', C = null, S = { personal:'', foto:null }, firmas = [], firmaHecha = [false,false];
 let MAPA = null, MARK = null, INFO = null, POS = null, SVC_GPS = null;
@@ -199,7 +200,7 @@ const $ = i => document.getElementById(i);
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function norm(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
 $('hlogo').src = __LOGO;
-CLIENTES.forEach(c => { const u = UBI[c.codigo]; if (u) { c.lat = u.lat; c.lng = u.lng; } });
+TODOS.forEach(c => { const u = UBI[c.codigo]; if (u) { c.lat = u.lat; c.lng = u.lng; } });
 
 // ----- PIN -----
 async function checkPin(){
@@ -207,7 +208,7 @@ async function checkPin(){
   try {
     const r = await fetch(BASE + 'truewaste/api/pin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pin:p})});
     const j = await r.json();
-    if (j.ok) { PIN = p; try { sessionStorage.setItem('tw_pin', p); } catch(e){} $('pinScreen').classList.add('hidden'); iniciar(); return; }
+    if (j.ok) { PIN = p; ZONA = j.zona || 'Bayamón'; CLIENTES = TODOS.filter(c => (c.zona || 'Bayamón') === ZONA); try { sessionStorage.setItem('tw_pin', p); } catch(e){} $('pinScreen').classList.add('hidden'); iniciar(); return; }
   } catch(e){}
   $('pinErr').textContent = 'PIN incorrecto';
 }
@@ -225,7 +226,7 @@ function iniciar(){
 // ----- Lista -----
 function verLista(){
   ['formArea','doneArea'].forEach(i=>$(i).classList.add('hidden')); $('listaArea').classList.remove('hidden');
-  $('btnLista').classList.add('hidden'); $('hsub').textContent = 'Escoge el cliente'; pintarLista(); window.scrollTo(0,0);
+  $('btnLista').classList.add('hidden'); $('hsub').textContent = 'Zona ' + ZONA + ' · Escoge el cliente'; pintarLista(); window.scrollTo(0,0);
 }
 function pintarLista(){
   const t = norm($('buscar').value), r = $('ruta').value;
